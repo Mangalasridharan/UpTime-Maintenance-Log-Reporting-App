@@ -1,0 +1,90 @@
+# ==================== FRONTEND (Next.js) ====================
+
+# Dependencies
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.*
+frontend/.yarn/*
+!frontend/.yarn/patches
+!frontend/.yarn/plugins
+!frontend/.yarn/releases
+!frontend/.yarn/versions
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/coverage/
+
+# Vercel
+frontend/.vercel
+
+# TypeScript
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Debug logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnpm-debug.log*
+
+# ==================== BACKEND (Spring Boot / Maven) ====================
+
+# Maven build output
+backend/target/
+backend/HELP.md
+backend/.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Maven wrapper (keep .mvnw scripts, ignore jar)
+!backend/.mvn/wrapper/maven-wrapper.properties
+
+# Spring Boot
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ==================== IDEs ====================
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+
+# Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ==================== MISC ====================
+
+# Environment variables (never commit these)
+.env
+.env*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS
+.DS_Store
+Thumbs.db
+*.pem
+
+# Logs
+*.log
