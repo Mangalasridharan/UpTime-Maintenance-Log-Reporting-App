@@ -1,6 +1,9 @@
 package com.msd.uptime.backend.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -22,12 +25,21 @@ public class User
     @Column(name="role", nullable=false)
     Role role;
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="department_id")
+    private Department department;
+
+    @CreationTimestamp
+    @Column(name="created_at", nullable=false)
+    private LocalDateTime createdAt;
+
     public User(){}
 
-    public User(String username, String email, Role role) {
+    public User(String username, String email, Role role, Department department) {
         this.username = username;
         this.email = email;
         this.role = role;
+        this.department = department;
     }
 
     public Long getId()
@@ -68,5 +80,15 @@ public class User
     public void setRole(Role role)
     {
         this.role = role;
+    }
+
+    public Department getDepartment()
+    {
+        return department;
+    }
+
+    public void setDepartment(Department department)
+    {
+        this.department = department;
     }
 }
