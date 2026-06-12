@@ -15,6 +15,19 @@ public class UserController
     @Autowired
     private UserService userService;
 
+    @PostMapping("/auth/register")
+    public  User registerUser(@RequestBody User user){
+        return userService.register(user);
+    }
+
+    @PostMapping("/auth/login")
+    public String loginUser(@RequestParam String email, @RequestParam String password){
+        if(userService.authenticate(email, password)){
+            return "Login Successful";
+        }
+        return "Login Unsuccessful";
+    }
+
     @PostMapping()
     public User createUser(@RequestBody User user)
     {

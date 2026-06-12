@@ -2,13 +2,21 @@ package com.msd.uptime.backend.models;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 
 @Entity
 @Table(name="Users")
-public class User
+@Getter
+@Setter
+public class User implements UserDetails
 {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -18,16 +26,19 @@ public class User
     @Column(name="name", nullable=false)
     private String username;
 
-    @Column(name="email", nullable=false)
+    @Column(name="email", nullable=false, unique=true)
     private String email;
+
+    @Column(name="password", nullable=false)
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(name="role", nullable=false)
     Role role;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="department_id")
-    private Department department;
+//    @ManyToOne(fetch=FetchType.LAZY)
+//    @JoinColumn(name="department_id")
+//    private Department department;
 
     @CreationTimestamp
     @Column(name="created_at", nullable=false)
@@ -35,60 +46,41 @@ public class User
 
     public User(){}
 
-    public User(String username, String email, Role role, Department department) {
+    public User(String username, String email, String password, Role role, Department department) {
         this.username = username;
         this.email = email;
+        this.password = password;
         this.role = role;
-        this.department = department;
+        //this.department = department;
     }
 
-    public Long getId()
-    {
-        return id;
+    @Override
+    public String getPassword(){
+        return this.password;
     }
 
-    public void setId(Long id)
-    {
-        this.id = id;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public String getUsername()
-    {
-        return username;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public void setUsername(String username)
-    {
-        this.username = username;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public String getEmail()
-    {
-        return email;
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
-    public void setEmail(String email)
-    {
-        this.email = email;
-    }
-
-    public Role getRole()
-    {
-        return role;
-    }
-
-    public void setRole(Role role)
-    {
-        this.role = role;
-    }
-
-    public Department getDepartment()
-    {
-        return department;
-    }
-
-    public void setDepartment(Department department)
-    {
-        this.department = department;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
     }
 }

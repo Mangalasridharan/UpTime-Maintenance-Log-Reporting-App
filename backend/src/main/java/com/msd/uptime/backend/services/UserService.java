@@ -9,4 +9,7 @@ public interface UserService
     User getUserById(Long id);
     List<User> getAllUsers();
     void deleteUserById(Long id);
+
+    User register(User user);
+    Boolean authenticate(String email, String password);
 }
