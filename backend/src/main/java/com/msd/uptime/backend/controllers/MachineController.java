@@ -1,6 +1,6 @@
 package com.msd.uptime.backend.controllers;
 
-
+import com.msd.uptime.backend.DTO.MachineRequest;
 import com.msd.uptime.backend.models.Machine;
 import com.msd.uptime.backend.services.MachineService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,8 @@ public class MachineController {
     private MachineService machineService;
 
     @PostMapping()
-    public Machine createMachine(@RequestBody Machine machine){
-        return machineService.createMachine(machine);
+    public Machine createMachine(@RequestBody MachineRequest machineRequest){
+        return machineService.createMachine(machineRequest);
     }
 
     @GetMapping("/{id}")

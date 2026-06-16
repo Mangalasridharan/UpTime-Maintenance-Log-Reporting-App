@@ -1,11 +1,10 @@
 package com.msd.uptime.backend.controllers;
 
+import com.msd.uptime.backend.DTO.EmployeeRequest;
 import com.msd.uptime.backend.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import com.msd.uptime.backend.models.Employee;
-
 import java.util.List;
 
 @RestController
@@ -16,8 +15,8 @@ public class UserController
     private EmployeeService employeeService;
 
     @PostMapping("/auth/register")
-    public Employee registerUser(@RequestBody Employee employee){
-        return employeeService.register(employee);
+    public Employee registerUser(@RequestBody EmployeeRequest employeeRequest){
+        return employeeService.register(employeeRequest);
     }
 
     @PostMapping("/auth/login")
@@ -26,8 +25,7 @@ public class UserController
     }
 
     @GetMapping("{id}")
-    public Employee getUser(@PathVariable Long id)
-    {
+    public Employee getUser(@PathVariable Long id) {
         return employeeService.getUserById(id);
     }
 

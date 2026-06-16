@@ -32,11 +32,11 @@ public class Employee
 
     @Enumerated(EnumType.STRING)
     @Column(name="role", nullable=false)
-    Role role;
+    EmployeeRole employeeRole;
 
-//    @ManyToOne(fetch=FetchType.LAZY)
-//    @JoinColumn(name="department_id")
-//    private Department department;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="department_id")
+    private Department department;
 
     @CreationTimestamp
     @Column(name="created_at", nullable=false)

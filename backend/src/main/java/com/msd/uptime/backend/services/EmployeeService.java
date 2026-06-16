@@ -1,4 +1,5 @@
 package com.msd.uptime.backend.services;
+import com.msd.uptime.backend.DTO.EmployeeRequest;
 import com.msd.uptime.backend.models.Employee;
 
 import java.util.List;
@@ -9,6 +10,6 @@ public interface EmployeeService
     List<Employee> getAllUsers();
     void deleteUserById(Long id);
 
-    Employee register(Employee employee);
+    Employee register(EmployeeRequest employee);
     String authenticate(String email, String password);
 }

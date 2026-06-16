@@ -1,6 +1,9 @@
 package com.msd.uptime.backend.services;
 
+import com.msd.uptime.backend.DTO.EmployeeRequest;
+import com.msd.uptime.backend.models.Department;
 import com.msd.uptime.backend.models.Employee;
+import com.msd.uptime.backend.repositories.DepartmentRepository;
 import com.msd.uptime.backend.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,8 +16,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService
-{
+public class EmployeeServiceImpl implements EmployeeService {
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
     @Autowired
     private EmployeeRepository employeeRepository;
 
@@ -30,11 +36,6 @@ public class EmployeeServiceImpl implements EmployeeService
         this.encoder = passwordEncoder;
     }
 
-//    public User createUser(User user)
-//    {
-//        return userRepository.save(user);
-//    }
-
     public Employee getUserById(Long id) {
         return employeeRepository.findById(id).orElse(null);
     }
@@ -48,9 +49,16 @@ public class EmployeeServiceImpl implements EmployeeService
         employeeRepository.deleteById(id);
     }
 
-    public Employee register(Employee employee){
-        employee.setPassword(encoder.encode(employee.getPassword()));
-        System.out.println("The password is "+ employee.getPassword());
+    public Employee register(EmployeeRequest employeeRequest){
+        Department department = departmentRepository.findDepartmentById(employeeRequest.getDepartmentId());
+
+        Employee employee = new Employee();
+        employee.setUsername(employeeRequest.getUsername());
+        employee.setEmail(employeeRequest.getEmail());
+        employee.setPassword(encoder.encode(employeeRequest.getPassword()));
+        employee.setEmployeeRole(employeeRequest.getEmployeeRole());
+        employee.setDepartment(department);
+
         return  employeeRepository.save(employee);
     }
 
