@@ -15,7 +15,7 @@ public class Machine {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="machine_status", nullable = false)
+    @Column(name="machine_status", nullable = false, columnDefinition = "varchar(20) default 'IDLE'")
     private MachineStatus status;
 
     @ManyToOne(fetch=FetchType.LAZY)

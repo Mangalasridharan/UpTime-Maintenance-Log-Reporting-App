@@ -1,10 +1,10 @@
 package com.msd.uptime.backend.controllers;
 
-import com.msd.uptime.backend.services.UserService;
+import com.msd.uptime.backend.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.msd.uptime.backend.models.User;
+import com.msd.uptime.backend.models.Employee;
 
 import java.util.List;
 
@@ -13,41 +13,32 @@ import java.util.List;
 public class UserController
 {
     @Autowired
-    private UserService userService;
+    private EmployeeService employeeService;
 
     @PostMapping("/auth/register")
-    public  User registerUser(@RequestBody User user){
-        return userService.register(user);
+    public Employee registerUser(@RequestBody Employee employee){
+        return employeeService.register(employee);
     }
 
     @PostMapping("/auth/login")
     public String loginUser(@RequestParam String email, @RequestParam String password){
-        if(userService.authenticate(email, password)){
-            return "Login Successful";
-        }
-        return "Login Unsuccessful";
-    }
-
-    @PostMapping()
-    public User createUser(@RequestBody User user)
-    {
-        return userService.createUser(user);
+        return employeeService.authenticate(email, password);
     }
 
     @GetMapping("{id}")
-    public User getUser(@PathVariable Long id)
+    public Employee getUser(@PathVariable Long id)
     {
-        return userService.getUserById(id);
+        return employeeService.getUserById(id);
     }
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id){
-        userService.deleteUserById(id);
+        employeeService.deleteUserById(id);
         return "User has been deleted";
     }
 
     @GetMapping()
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public List<Employee> getAllUsers() {
+        return employeeService.getAllUsers();
     }
 }
