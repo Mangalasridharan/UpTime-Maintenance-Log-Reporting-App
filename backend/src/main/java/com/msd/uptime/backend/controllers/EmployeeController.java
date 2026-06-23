@@ -1,27 +1,30 @@
 package com.msd.uptime.backend.controllers;
 
-import com.msd.uptime.backend.DTO.EmployeeRequest;
+import com.msd.uptime.backend.DTO.Employee.EmployeeLoginRequest;
+import com.msd.uptime.backend.DTO.Employee.EmployeeRegisterRequest;
 import com.msd.uptime.backend.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.msd.uptime.backend.models.Employee;
 import java.util.List;
 
 @RestController
-@RequestMapping("/uptime/api/v1/users")
-public class UserController
+@RequestMapping("/uptime/api/v1/employee")
+public class EmployeeController
 {
     @Autowired
     private EmployeeService employeeService;
 
+    @PreAuthorize("hasRole ('HEAD')")
     @PostMapping("/auth/register")
-    public Employee registerUser(@RequestBody EmployeeRequest employeeRequest){
-        return employeeService.register(employeeRequest);
+    public Employee registerUser(@RequestBody EmployeeRegisterRequest registerRequest){
+        return employeeService.register(registerRequest);
     }
 
     @PostMapping("/auth/login")
-    public String loginUser(@RequestParam String email, @RequestParam String password){
-        return employeeService.authenticate(email, password);
+    public String loginUser(@RequestBody EmployeeLoginRequest loginRequest){
+        return employeeService.authenticate(loginRequest);
     }
 
     @GetMapping("{id}")
@@ -29,6 +32,7 @@ public class UserController
         return employeeService.getUserById(id);
     }
 
+    @PreAuthorize("hasRole ('HEAD')")
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id){
         employeeService.deleteUserById(id);

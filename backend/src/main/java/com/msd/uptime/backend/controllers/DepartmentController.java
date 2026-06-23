@@ -2,6 +2,7 @@ package com.msd.uptime.backend.controllers;
 
 import com.msd.uptime.backend.services.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.msd.uptime.backend.models.Department;
 
@@ -14,6 +15,7 @@ public class DepartmentController {
     @Autowired
     private DepartmentService departmentService;
 
+    @PreAuthorize("hasRole ('HEAD')")
     @PostMapping()
     public Department createDepartment(@RequestBody Department department){
         return departmentService.createDepartment(department);
@@ -29,6 +31,7 @@ public class DepartmentController {
         return departmentService.getAllDepartments();
     }
 
+    @PreAuthorize("hasRole ('HEAD')")
     @DeleteMapping("/{id}")
     public String deleteDepartment(@PathVariable("id") Long id){
         departmentService.deleteDepartmentById(id);

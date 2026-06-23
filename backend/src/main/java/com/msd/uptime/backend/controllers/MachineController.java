@@ -4,6 +4,7 @@ import com.msd.uptime.backend.DTO.MachineRequest;
 import com.msd.uptime.backend.models.Machine;
 import com.msd.uptime.backend.services.MachineService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class MachineController {
     @Autowired
     private MachineService machineService;
 
+    @PreAuthorize("hasRole ('HEAD')")
     @PostMapping()
     public Machine createMachine(@RequestBody MachineRequest machineRequest){
         return machineService.createMachine(machineRequest);
@@ -30,9 +32,11 @@ public class MachineController {
         return machineService.getAllMachines();
     }
 
+    @PreAuthorize("hasRole ('HEAD')")
     @DeleteMapping("/{id}")
     public String deleteMachine(@RequestBody Long id){
         machineService.deleteMachineById(id);
         return "Machine Deleted Successfully!";
     }
+
 }

@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.msd.uptime.backend.repositories.EmployeeRepository;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -28,10 +30,23 @@ public class SecurityConfig {
     }
 
     @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173")
+                        .allowedMethods("*");
+            }
+        };
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService, JwtAuthFilter jwtAuthFilter) throws Exception {
-        http.
-                csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests(requests -> requests.requestMatchers("/uptime/api/v1/users/auth/**").permitAll()
+        http
+                .cors(Customizer.withDefaults())
+                .csrf(customizer -> customizer.disable())
+                .authorizeHttpRequests(requests -> requests.requestMatchers("/uptime/api/v1/employee/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(display -> display.disable())
                 .httpBasic(Customizer.withDefaults())

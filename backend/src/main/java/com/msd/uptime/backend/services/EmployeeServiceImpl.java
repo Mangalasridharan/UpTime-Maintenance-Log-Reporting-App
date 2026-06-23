@@ -1,8 +1,10 @@
 package com.msd.uptime.backend.services;
 
-import com.msd.uptime.backend.DTO.EmployeeRequest;
+import com.msd.uptime.backend.DTO.Employee.EmployeeLoginRequest;
+import com.msd.uptime.backend.DTO.Employee.EmployeeRegisterRequest;
 import com.msd.uptime.backend.models.Department;
 import com.msd.uptime.backend.models.Employee;
+import com.msd.uptime.backend.models.EmployeeRole;
 import com.msd.uptime.backend.repositories.DepartmentRepository;
 import com.msd.uptime.backend.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,23 +51,33 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeRepository.deleteById(id);
     }
 
-    public Employee register(EmployeeRequest employeeRequest){
-        Department department = departmentRepository.findDepartmentById(employeeRequest.getDepartmentId());
-
+    public Employee register(EmployeeRegisterRequest employeeRegisterRequest){
+        Department department = departmentRepository.findDepartmentById(employeeRegisterRequest.getDepartmentId());
+        System.out.println(department);
         Employee employee = new Employee();
-        employee.setUsername(employeeRequest.getUsername());
-        employee.setEmail(employeeRequest.getEmail());
-        employee.setPassword(encoder.encode(employeeRequest.getPassword()));
-        employee.setEmployeeRole(employeeRequest.getEmployeeRole());
+        employee.setUsername(employeeRegisterRequest.getUsername());
+        employee.setEmail(employeeRegisterRequest.getEmail());
+        employee.setPassword(encoder.encode(employeeRegisterRequest.getPassword()));
+        employee.setEmployeeRole(employeeRegisterRequest.getEmployeeRole());
         employee.setDepartment(department);
+
+        if(employee.getEmployeeRole()==EmployeeRole.HEAD || employee.getEmployeeRole()==EmployeeRole.HOD){
+            employee.setSpecialization(null);
+        }
+        else{
+            employee.setSpecialization(employeeRegisterRequest.getSpecialization());
+        }
 
         return  employeeRepository.save(employee);
     }
 
-    public String authenticate(String email, String password){
-        Employee employee = employeeRepository.findByEmail(email);
+    public String authenticate(EmployeeLoginRequest loginRequest){
+        System.out.println(loginRequest.getEmail());
+        System.out.println(loginRequest.getPassword());
+        Employee employee = employeeRepository.findByEmail(loginRequest.getEmail());
+        System.out.println(employee);
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
 
         if(authentication.isAuthenticated()) {

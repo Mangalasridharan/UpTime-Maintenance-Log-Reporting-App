@@ -26,6 +26,4 @@ public class EmployeeDetailsService implements UserDetailsService {
         }
         return new EmployeeDetails(employee);
     }
-
-
 }
