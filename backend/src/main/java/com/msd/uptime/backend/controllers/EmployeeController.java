@@ -1,6 +1,7 @@
 package com.msd.uptime.backend.controllers;
 
 import com.msd.uptime.backend.DTO.Employee.EmployeeLoginRequest;
+import com.msd.uptime.backend.DTO.Employee.EmployeeLoginResponse;
 import com.msd.uptime.backend.DTO.Employee.EmployeeRegisterRequest;
 import com.msd.uptime.backend.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,13 @@ public class EmployeeController
     @PreAuthorize("hasRole ('HEAD')")
     @PostMapping("/auth/register")
     public Employee registerUser(@RequestBody EmployeeRegisterRequest registerRequest){
+
         return employeeService.register(registerRequest);
     }
 
     @PostMapping("/auth/login")
-    public String loginUser(@RequestBody EmployeeLoginRequest loginRequest){
+    public EmployeeLoginResponse loginUser(@RequestBody EmployeeLoginRequest loginRequest){
+        System.out.println("reached here");
         return employeeService.authenticate(loginRequest);
     }
 

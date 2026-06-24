@@ -1,5 +1,6 @@
 package com.msd.uptime.backend.controllers;
 
+import com.msd.uptime.backend.DTO.DashboardResponse;
 import com.msd.uptime.backend.DTO.MachineRequest;
 import com.msd.uptime.backend.models.Machine;
 import com.msd.uptime.backend.services.MachineService;
@@ -37,6 +38,20 @@ public class MachineController {
     public String deleteMachine(@RequestBody Long id){
         machineService.deleteMachineById(id);
         return "Machine Deleted Successfully!";
+    }
+
+    @GetMapping("/dashboard")
+    public DashboardResponse getAllMachinesDashboard(){
+        long start = System.currentTimeMillis();
+
+        DashboardResponse response = machineService.getDashboard();
+
+        System.out.println(
+                "Controller Time: " +
+                        (System.currentTimeMillis() - start) + " ms"
+        );
+
+        return response;
     }
 
 }

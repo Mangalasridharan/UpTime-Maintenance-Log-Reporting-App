@@ -1,5 +1,6 @@
 package com.msd.uptime.backend.services;
 import com.msd.uptime.backend.DTO.Employee.EmployeeLoginRequest;
+import com.msd.uptime.backend.DTO.Employee.EmployeeLoginResponse;
 import com.msd.uptime.backend.DTO.Employee.EmployeeRegisterRequest;
 import com.msd.uptime.backend.models.Employee;
 
@@ -12,5 +13,5 @@ public interface EmployeeService
     void deleteUserById(Long id);
 
     Employee register(EmployeeRegisterRequest registerRequest);
-    String authenticate(EmployeeLoginRequest loginRequest);
+    EmployeeLoginResponse authenticate(EmployeeLoginRequest loginRequest);
 }

@@ -1,6 +1,7 @@
 package com.msd.uptime.backend.services;
 
 import com.msd.uptime.backend.DTO.Employee.EmployeeLoginRequest;
+import com.msd.uptime.backend.DTO.Employee.EmployeeLoginResponse;
 import com.msd.uptime.backend.DTO.Employee.EmployeeRegisterRequest;
 import com.msd.uptime.backend.models.Department;
 import com.msd.uptime.backend.models.Employee;
@@ -71,21 +72,24 @@ public class EmployeeServiceImpl implements EmployeeService {
         return  employeeRepository.save(employee);
     }
 
-    public String authenticate(EmployeeLoginRequest loginRequest){
-        System.out.println(loginRequest.getEmail());
-        System.out.println(loginRequest.getPassword());
-        Employee employee = employeeRepository.findByEmail(loginRequest.getEmail());
-        System.out.println(employee);
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+    public EmployeeLoginResponse authenticate(EmployeeLoginRequest loginRequest){
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
         );
 
-        if(authentication.isAuthenticated()) {
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            System.out.println(jwtService.generateToken(employee.getEmail()));
-            return jwtService.generateToken(employee.getEmail());
-        }
-        return "";
+        Employee employee = employeeRepository.findByEmail(
+                loginRequest.getEmail()
+        );
+
+        return new EmployeeLoginResponse(
+                jwtService.generateToken(employee.getEmail()),
+                employee.getEmployeeRole().name(),
+                employee.getUsername()
+        );
     }
 
 }
