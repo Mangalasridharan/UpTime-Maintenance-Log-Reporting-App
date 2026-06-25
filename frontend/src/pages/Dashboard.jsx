@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
+import Machines from "./Machines.jsx"
 
 function Dashboard() {
 
@@ -67,6 +68,9 @@ function Dashboard() {
 
             <h3>Under Maintenance : {underMaintenanceMachines}</h3>
 
+            <hr/>
+            <h2>Machines List</h2>
+            <Machines/>
         </div>
     );
 }

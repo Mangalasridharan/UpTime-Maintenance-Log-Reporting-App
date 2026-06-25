@@ -51,8 +51,6 @@ public class MachineServiceImpl implements MachineService {
 
         long start = System.currentTimeMillis();
 
-
-
         Long totalMachines = machineRepository.count();
         Long runningMachines = getMachineCount(MachineStatus.RUNNING);
         Long idleMachines = getMachineCount(MachineStatus.IDLE);

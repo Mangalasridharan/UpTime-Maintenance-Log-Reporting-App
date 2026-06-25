@@ -1,22 +1,43 @@
 package com.msd.uptime.backend.controllers;
 
+import com.msd.uptime.backend.DTO.ComplaintRequest;
 import com.msd.uptime.backend.models.Complaint;
 import com.msd.uptime.backend.services.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user/api/v1/complaint")
+@RequestMapping("/uptime/api/v1/complaint")
 public class ComplaintController {
 
     @Autowired
     private ComplaintService complaintService;
 
-//    @PostMapping()
-//    public Complaint createComplaint(@RequestBody Complaint complaint){
-//        return complaintService.createComplaint(complaint);
-//    }
+    @PreAuthorize("hasAnyRole ('SHIFT_WORKER', 'GENERAL_WORKER', 'HOD')")
+    @PostMapping()
+    public Complaint createComplaint(@RequestBody ComplaintRequest complaint){
+        return complaintService.createComplaint(complaint);
+    }
+
+    @PreAuthorize("hasAnyRole ('HOD', 'HEAD')")
+    @PatchMapping("/{id}/assign")
+    public Complaint assignComplaint(@PathVariable Long complaint_id, @RequestParam(name="id") Long employee_id){
+        return complaintService.assignComplaint(complaint_id, employee_id);
+    }
+
+    @PreAuthorize("hasAnyRole ('SHIFT_WORKER', 'GENERAL_WORKER')")
+    @PatchMapping("/{id}/resolve")
+    public Complaint resolveComplaint(@PathVariable Long complaint_id){
+        return complaintService.completeComplaint(complaint_id);
+    }
+
+    @PreAuthorize("hasAnyRole ('HEAD')")
+    @PatchMapping("/{id}/verify")
+    public Complaint verifyComplaint(@PathVariable Long complaint_id){
+        return complaintService.completeComplaint(complaint_id);
+    }
+
+
+
 }
