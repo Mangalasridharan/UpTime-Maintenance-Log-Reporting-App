@@ -12,5 +12,5 @@ import java.util.List;
 public interface MachineRepository extends JpaRepository<Machine,Long> {
     Long countByStatus(MachineStatus status);
     List<Machine> findByStatus(MachineStatus status);
-    Machine findByMachineId(Long machineId);
+    Machine findMachineById(Long id);
 }

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/uptime/api/v1/complaint")
 public class ComplaintController {
@@ -14,7 +16,7 @@ public class ComplaintController {
     @Autowired
     private ComplaintService complaintService;
 
-    @PreAuthorize("hasAnyRole ('SHIFT_WORKER', 'GENERAL_WORKER', 'HOD')")
+    @PreAuthorize("hasAnyRole ('SHIFT_WORKER', 'GENERAL_WORKER', 'HOD', 'HEAD')")
     @PostMapping()
     public Complaint createComplaint(@RequestBody ComplaintRequest complaint){
         return complaintService.createComplaint(complaint);
@@ -22,7 +24,7 @@ public class ComplaintController {
 
     @PreAuthorize("hasAnyRole ('HOD', 'HEAD')")
     @PatchMapping("/{id}/assign")
-    public Complaint assignComplaint(@PathVariable Long complaint_id, @RequestParam(name="id") Long employee_id){
+    public Complaint assignComplaint(@PathVariable("id") Long complaint_id, @RequestParam(name="id") Long employee_id){
         return complaintService.assignComplaint(complaint_id, employee_id);
     }
 
@@ -38,6 +40,10 @@ public class ComplaintController {
         return complaintService.completeComplaint(complaint_id);
     }
 
+    @GetMapping()
+    public List<Complaint> getComplaintList(){
+        return complaintService.getAllComplaints();
+    }
 
 
 }

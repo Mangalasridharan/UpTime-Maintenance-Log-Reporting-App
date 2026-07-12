@@ -46,10 +46,10 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests(requests -> requests.requestMatchers("/uptime/api/v1/employee/auth/**").permitAll()
+                .authorizeHttpRequests(requests -> requests.requestMatchers("/ws/**","/uptime/api/v1/employee/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(display -> display.disable())
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(httpBasic -> httpBasic.disable())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

@@ -3,6 +3,8 @@ package com.msd.uptime.backend.controllers;
 import com.msd.uptime.backend.DTO.DashboardResponse;
 import com.msd.uptime.backend.DTO.MachineRequest;
 import com.msd.uptime.backend.models.Machine;
+import com.msd.uptime.backend.models.MachineStatus;
+import com.msd.uptime.backend.services.StatusDashboardService;
 import com.msd.uptime.backend.services.MachineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +18,9 @@ public class MachineController {
 
     @Autowired
     private MachineService machineService;
+
+    @Autowired
+    private StatusDashboardService statusDashboardService;
 
     @PreAuthorize("hasRole ('HEAD')")
     @PostMapping()
@@ -35,23 +40,19 @@ public class MachineController {
 
     @PreAuthorize("hasRole ('HEAD')")
     @DeleteMapping("/{id}")
-    public String deleteMachine(@RequestBody Long id){
+    public String deleteMachine(@PathVariable Long id){
         machineService.deleteMachineById(id);
         return "Machine Deleted Successfully!";
     }
 
     @GetMapping("/dashboard")
     public DashboardResponse getAllMachinesDashboard(){
-        long start = System.currentTimeMillis();
+        return statusDashboardService.getStatusDashboard();
+    }
 
-        DashboardResponse response = machineService.getDashboard();
-
-        System.out.println(
-                "Controller Time: " +
-                        (System.currentTimeMillis() - start) + " ms"
-        );
-
-        return response;
+    @PatchMapping("/{id}/{status}")
+    public Machine updateMachineStatus(@PathVariable Long id, @PathVariable MachineStatus status){
+        return machineService.changeMachineStatus(id, status);
     }
 
 }

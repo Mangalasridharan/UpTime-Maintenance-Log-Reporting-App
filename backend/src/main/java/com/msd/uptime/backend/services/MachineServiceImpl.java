@@ -1,6 +1,5 @@
 package com.msd.uptime.backend.services;
 
-import com.msd.uptime.backend.DTO.DashboardResponse;
 import com.msd.uptime.backend.DTO.MachineRequest;
 import com.msd.uptime.backend.models.Department;
 import com.msd.uptime.backend.models.Machine;
@@ -10,7 +9,6 @@ import com.msd.uptime.backend.repositories.MachineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,13 +20,21 @@ public class MachineServiceImpl implements MachineService {
     @Autowired
     private MachineRepository machineRepository;
 
+    @Autowired
+    private StatusDashboardService statusDashboardService;
+
+    @Autowired
+    private ListDashboardService listDashboardService;
+
     public Machine createMachine(MachineRequest machineRequest){
 
         Department department = departmentRepository.findDepartmentById(machineRequest.getDepartmentId());
         Machine machine = new Machine();
         machine.setName(machineRequest.getName());
         machine.setDepartment(department);
-        return machineRepository.save(machine);
+        Machine saved =  machineRepository.save(machine);
+        listDashboardService.publishListDashboard();
+        return saved;
     }
 
     public Machine getMachineById(Long id){
@@ -41,29 +47,18 @@ public class MachineServiceImpl implements MachineService {
 
     public void deleteMachineById(Long id){
         machineRepository.deleteById(id);
+        statusDashboardService.publishStatusDashboard();
+        listDashboardService.publishListDashboard();
     }
 
-    public Long getMachineCount(MachineStatus status){
-        return machineRepository.countByStatus(status);
+    public Machine changeMachineStatus(Long id, MachineStatus machineStatus){
+        Machine machine = getMachineById(id);
+        machine.setStatus(machineStatus);
+        machineRepository.save(machine);
+
+        statusDashboardService.publishStatusDashboard();
+        listDashboardService.publishListDashboard();
+        return machine;
     }
 
-    public DashboardResponse getDashboard(){
-
-        long start = System.currentTimeMillis();
-
-        Long totalMachines = machineRepository.count();
-        Long runningMachines = getMachineCount(MachineStatus.RUNNING);
-        Long idleMachines = getMachineCount(MachineStatus.IDLE);
-        Long underMaintenanceMachines = getMachineCount(MachineStatus.UNDER_MAINTENANCE);
-        System.out.println("Count took: " +
-                (System.currentTimeMillis() - start) + " ms");
-
-        return new DashboardResponse(
-                totalMachines,
-                runningMachines,
-                idleMachines,
-                underMaintenanceMachines
-        );
-
-    }
 }

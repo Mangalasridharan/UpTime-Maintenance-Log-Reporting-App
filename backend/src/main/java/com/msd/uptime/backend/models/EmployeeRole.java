@@ -1,7 +1,6 @@
 package com.msd.uptime.backend.models;
 
-public enum EmployeeRole
-{
+public enum EmployeeRole {
     HEAD,
     HOD,
     SHIFT_WORKER,

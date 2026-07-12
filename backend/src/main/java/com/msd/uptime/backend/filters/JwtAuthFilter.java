@@ -33,6 +33,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         System.out.println("JWT FILTER: " + request.getRequestURI());
 
+        String path = request.getServletPath();
+
+        System.out.println(path);
+
+        if(path.startsWith("/ws")){
+            filterChain.doFilter(request,response);
+            return;
+        }
+
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);

@@ -8,6 +8,8 @@ import com.msd.uptime.backend.repositories.MachineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ComplaintServiceImpl implements ComplaintService {
 
@@ -20,8 +22,18 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    @Autowired
+    private ListDashboardService listDashboardService;
+
+    @Autowired
+    private ComplaintDashboardService complaintDashboardService;
+
+    public List<Complaint> getAllComplaints(){
+        return complaintRepository.findAll();
+    }
+
     public Complaint createComplaint(ComplaintRequest complaint) {
-        Machine machine = machineRepository.findByMachineId(complaint.getMachineId());
+        Machine machine = machineRepository.findMachineById(complaint.getMachineId());
         machine.setStatus(MachineStatus.IDLE);
         Employee reported_by = employeeRepository.getOne(complaint.getEmployeeId());
 
@@ -30,8 +42,11 @@ public class ComplaintServiceImpl implements ComplaintService {
         complaintEntry.setMachine(machine);
         complaintEntry.setReportedBy(reported_by);
         complaintEntry.setStatus(ComplaintStatus.OPEN);
+        Complaint saved =  complaintRepository.save(complaintEntry);
 
-        return complaintRepository.save(complaintEntry);
+        listDashboardService.publishListDashboard();
+        complaintDashboardService.publishComplaintDashboard();
+        return saved;
     }
 
     public Complaint assignComplaint(Long complaint_id, Long employee_id){
@@ -41,19 +56,27 @@ public class ComplaintServiceImpl implements ComplaintService {
         complaintEntry.setAssignedTo(assigned_to);
         complaintEntry.setStatus(ComplaintStatus.ASSIGNED);
         complaintEntry.getMachine().setStatus(MachineStatus.UNDER_MAINTENANCE);
-        return complaintRepository.save(complaintEntry);
+        Complaint saved =  complaintRepository.save(complaintEntry);
+
+        complaintDashboardService.publishComplaintDashboard();
+        return saved;
     }
 
     public Complaint completeComplaint(Long complaint_id){
         Complaint complaintEntry = complaintRepository.getById(complaint_id);
         complaintEntry.setStatus(ComplaintStatus.COMPLETED);
-        return complaintRepository.save(complaintEntry);
+        Complaint saved =  complaintRepository.save(complaintEntry);
+        complaintDashboardService.publishComplaintDashboard();
+        return saved;
     }
 
     public Complaint verifyComplaint(Long complaint_id){
         Complaint complaintEntry = complaintRepository.getById(complaint_id);
         complaintEntry.setStatus(ComplaintStatus.VERIFIED);
         complaintEntry.getMachine().setStatus(MachineStatus.RUNNING);
-        return complaintRepository.save(complaintEntry);
+
+        Complaint saved =  complaintRepository.save(complaintEntry);
+        complaintDashboardService.publishComplaintDashboard();
+        return saved;
     }
 }

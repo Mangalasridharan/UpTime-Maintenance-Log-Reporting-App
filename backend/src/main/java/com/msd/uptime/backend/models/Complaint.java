@@ -41,7 +41,7 @@ public class Complaint {
     private ComplaintStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="reported_by", nullable=false)
+    @JoinColumn(name="assigned_to")
     private Employee assignedTo;
 
     @Column(name="assigned_at")
