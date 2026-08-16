@@ -28,6 +28,9 @@ function Login() {
       localStorage.setItem("role", response.data.role);
       localStorage.setItem("username", response.data.username);
       localStorage.setItem("email", employeeEmail);
+      if (response.data.id) {
+        localStorage.setItem("employeeId", response.data.id);
+      }
 
       navigate("/dashboard");
     } catch (err) {

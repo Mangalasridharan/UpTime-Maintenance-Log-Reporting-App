@@ -28,6 +28,8 @@ function Machines() {
   const [isComplaintFormOpen, setIsComplaintFormOpen] = useState(false);
   const [complaintText, setComplaintText] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const previousMachines = useRef([]);
 
@@ -86,6 +88,16 @@ function Machines() {
 
     getMachineListResponse();
   }, []);
+
+  // Sync selectedMachine state whenever machines array is updated via WS or REST
+  useEffect(() => {
+    if (selectedMachine) {
+      const updated = machines.find(m => m.id === selectedMachine.id);
+      if (updated) {
+        setSelectedMachine(updated);
+      }
+    }
+  }, [machines]);
 
   // Filter logic combining search and status select
   const filteredMachines = useMemo(() => {
@@ -199,15 +211,52 @@ function Machines() {
     setIsComplaintFormOpen(false);
     setComplaintText("");
     setIsSuccess(false);
+    setErrorMsg("");
+    setSubmitting(false);
   };
 
-  const handleComplaintSubmit = (e) => {
+  const handleComplaintSubmit = async (e) => {
     e.preventDefault();
-    setIsSuccess(true);
-    // Auto-close detail modal after success animation
-    setTimeout(() => {
-      closeModal();
-    }, 2000);
+    if (!selectedMachine) return;
+    setErrorMsg("");
+    setSubmitting(true);
+
+    try {
+      let empId = localStorage.getItem("employeeId");
+
+      if (!empId) {
+        const storedEmail = localStorage.getItem("email");
+        const storedUsername = localStorage.getItem("username");
+        const employeeRes = await api.get("/v1/employee");
+        const allEmployees = employeeRes.data || [];
+        const matched = allEmployees.find(
+          emp => emp.email === storedEmail || emp.username === storedUsername
+        );
+        if (matched && matched.id) {
+          empId = matched.id;
+          localStorage.setItem("employeeId", matched.id);
+        }
+      }
+
+      await api.post("/v1/complaint", {
+        description: complaintText,
+        machineId: selectedMachine.id,
+        employeeId: empId ? Number(empId) : null,
+      });
+
+      setSelectedMachine(prev => prev ? { ...prev, status: "IDLE" } : prev);
+      setIsSuccess(true);
+      setTimeout(() => {
+        closeModal();
+      }, 2000);
+    } catch (err) {
+      console.error("Error submitting complaint:", err);
+      setErrorMsg(
+        err.response?.data?.message || "Failed to submit complaint. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -431,6 +480,7 @@ function Machines() {
                 </div>
               ) : isComplaintFormOpen ? (
                 <form onSubmit={handleComplaintSubmit} className="complaint-form">
+                  {errorMsg && <div className="error-message" style={{ marginBottom: '1rem', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem' }}>{errorMsg}</div>}
                   <label htmlFor="complaint-desc">COMPLAINT STATEMENT</label>
                   <textarea
                     id="complaint-desc"
@@ -438,17 +488,19 @@ function Machines() {
                     value={complaintText}
                     onChange={(e) => setComplaintText(e.target.value)}
                     required
+                    disabled={submitting}
                   />
                   <div className="form-actions">
                     <button 
                       type="button" 
                       className="btn-cancel" 
                       onClick={() => setIsComplaintFormOpen(false)}
+                      disabled={submitting}
                     >
                       Cancel
                     </button>
-                    <button type="submit" className="btn-submit-complaint">
-                      Submit Complaint
+                    <button type="submit" className="btn-submit-complaint" disabled={submitting}>
+                      {submitting ? "Submitting..." : "Submit Complaint"}
                     </button>
                   </div>
                 </form>
