@@ -11,3 +11,4 @@ public class DashboardResponse {
     private Long idleMachines;
     private Long underMaintenanceMachines;
 }
+ 

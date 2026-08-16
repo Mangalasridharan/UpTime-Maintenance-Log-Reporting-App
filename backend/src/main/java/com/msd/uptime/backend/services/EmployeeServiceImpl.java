@@ -88,7 +88,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new EmployeeLoginResponse(
                 jwtService.generateToken(employee.getEmail()),
                 employee.getEmployeeRole().name(),
-                employee.getUsername()
+                employee.getUsername(),
+                employee.getId()
         );
     }
 

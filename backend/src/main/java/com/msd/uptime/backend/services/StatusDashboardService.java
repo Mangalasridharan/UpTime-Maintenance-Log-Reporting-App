@@ -22,6 +22,7 @@ public class StatusDashboardService {
         Long underMaintenanceMachines = machineRepository.countByStatus(MachineStatus.UNDER_MAINTENANCE);
 
         return new DashboardResponse(
+
                 totalMachines,
                 runningMachines,
                 idleMachines,

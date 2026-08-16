@@ -1,11 +1,13 @@
 package com.msd.uptime.backend.services;
 
 import com.msd.uptime.backend.DTO.ComplaintRequest;
+import com.msd.uptime.backend.events.NotificationEvent;
 import com.msd.uptime.backend.models.*;
 import com.msd.uptime.backend.repositories.ComplaintRepository;
 import com.msd.uptime.backend.repositories.EmployeeRepository;
 import com.msd.uptime.backend.repositories.MachineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +30,12 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Autowired
     private ComplaintDashboardService complaintDashboardService;
 
+    @Autowired
+    private StatusDashboardService statusDashboardService;
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
     public List<Complaint> getAllComplaints(){
         return complaintRepository.findAll();
     }
@@ -35,6 +43,7 @@ public class ComplaintServiceImpl implements ComplaintService {
     public Complaint createComplaint(ComplaintRequest complaint) {
         Machine machine = machineRepository.findMachineById(complaint.getMachineId());
         machine.setStatus(MachineStatus.IDLE);
+        machineRepository.save(machine);
         Employee reported_by = employeeRepository.getOne(complaint.getEmployeeId());
 
         Complaint complaintEntry = new Complaint();
@@ -44,8 +53,17 @@ public class ComplaintServiceImpl implements ComplaintService {
         complaintEntry.setStatus(ComplaintStatus.OPEN);
         Complaint saved =  complaintRepository.save(complaintEntry);
 
+        publisher.publishEvent(new NotificationEvent(
+                reported_by,
+                "New Complaint Raised",
+                reported_by.getUsername() +
+                        " has raised a complaint on " +
+                        machine.getName()
+        ));
+
         listDashboardService.publishListDashboard();
         complaintDashboardService.publishComplaintDashboard();
+        statusDashboardService.publishStatusDashboard();
         return saved;
     }
 
@@ -55,10 +73,16 @@ public class ComplaintServiceImpl implements ComplaintService {
 
         complaintEntry.setAssignedTo(assigned_to);
         complaintEntry.setStatus(ComplaintStatus.ASSIGNED);
-        complaintEntry.getMachine().setStatus(MachineStatus.UNDER_MAINTENANCE);
+        Machine machine = complaintEntry.getMachine();
+        if (machine != null) {
+            machine.setStatus(MachineStatus.UNDER_MAINTENANCE);
+            machineRepository.save(machine);
+        }
         Complaint saved =  complaintRepository.save(complaintEntry);
 
+        listDashboardService.publishListDashboard();
         complaintDashboardService.publishComplaintDashboard();
+        statusDashboardService.publishStatusDashboard();
         return saved;
     }
 
@@ -73,10 +97,16 @@ public class ComplaintServiceImpl implements ComplaintService {
     public Complaint verifyComplaint(Long complaint_id){
         Complaint complaintEntry = complaintRepository.getById(complaint_id);
         complaintEntry.setStatus(ComplaintStatus.VERIFIED);
-        complaintEntry.getMachine().setStatus(MachineStatus.RUNNING);
+        Machine machine = complaintEntry.getMachine();
+        if (machine != null) {
+            machine.setStatus(MachineStatus.RUNNING);
+            machineRepository.save(machine);
+        }
 
         Complaint saved =  complaintRepository.save(complaintEntry);
+        listDashboardService.publishListDashboard();
         complaintDashboardService.publishComplaintDashboard();
+        statusDashboardService.publishStatusDashboard();
         return saved;
     }
 }

@@ -9,4 +9,5 @@ public class EmployeeLoginResponse {
     private String jwtToken;
     private String role;
     private String username;
+    private Long id;
 }

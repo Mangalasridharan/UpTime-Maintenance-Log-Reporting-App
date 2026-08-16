@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.crypto.Mac;
 import java.time.LocalDateTime;
 
 @Entity(name="complaints")
