@@ -9,6 +9,7 @@ import { Search, ChevronLeft, ChevronRight, SlidersHorizontal, X, LayoutGrid, Li
 import api from "../api/axios";
 import SockJS from "sockjs-client/dist/sockjs";
 import {Client} from "@stomp/stompjs";
+import { WS_BASE_URL } from "../config/api";
 
 function Machines() {
   const [machines, setMachines] = useState([]);
@@ -35,7 +36,7 @@ function Machines() {
 
   // WebSocket subscription for real-time machine list updates
   useEffect(() => {
-    const socket = new SockJS("http://localhost:8000/ws");
+    const socket = new SockJS(WS_BASE_URL);
     const client = new Client({
       webSocketFactory: () => socket,
       onConnect: () => {

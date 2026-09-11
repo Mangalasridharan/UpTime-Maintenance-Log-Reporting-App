@@ -10,6 +10,7 @@ import { Search, ChevronLeft, ChevronRight, AlertCircle, X } from 'lucide-react'
 import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
 import api from "../api/axios";
+import { WS_BASE_URL } from "../config/api";
 
 function ComplaintDashboard() {
   const [complaints, setComplaints] = useState([]);
@@ -22,7 +23,7 @@ function ComplaintDashboard() {
 
   // WebSocket subscription
   useEffect(() => {
-    const socket = new SockJS("http://localhost:8000/ws");
+    const socket = new SockJS(WS_BASE_URL);
     const client = new Client({
       webSocketFactory: () => socket,
       onConnect: () => {

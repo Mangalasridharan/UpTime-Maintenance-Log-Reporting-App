@@ -30,7 +30,7 @@ function Register() {
         departmentId: deptId,
       });
 
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       setError(
         err.response?.data?.message || "Registration failed. Verification rejected."
@@ -42,6 +42,26 @@ function Register() {
 
   return (
     <div className="auth-page register-page">
+      <div style={{ position: "absolute", top: "1.5rem", left: "1.5rem", zIndex: 10000 }}>
+        <Link
+          to="/"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.4rem",
+            textDecoration: "none",
+            color: "var(--text-secondary)",
+            fontSize: "0.85rem",
+            fontWeight: 600,
+            background: "var(--bg-surface)",
+            border: "1px solid var(--border-color)",
+            padding: "0.45rem 0.85rem",
+            borderRadius: "8px",
+          }}
+        >
+          ← Back to Home
+        </Link>
+      </div>
       <div style={{ position: "absolute", top: "1.5rem", right: "1.5rem", zIndex: 10000 }}>
         <ThemeToggle />
       </div>
@@ -70,8 +90,8 @@ function Register() {
           </div>
         </div>
         <div className="auth-card-header">
-          <h1>Operator Registration</h1>
-          <p>Register new operator node to gain access to the console.</p>
+          <h1>Employee Registration</h1>
+          <p>Register new employee to gain access to the console.</p>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -80,7 +100,7 @@ function Register() {
           <div className="form-row">
             {/* Full Name */}
             <div className="form-group">
-              <label htmlFor="name">OPERATOR FULL NAME</label>
+              <label htmlFor="name">EMPLOYEE FULL NAME</label>
               <input
                 id="name"
                 className="form-input"
@@ -177,7 +197,6 @@ function Register() {
                 <option value="" disabled>
                   Select Role
                 </option>
-                <option value="HEAD">Head</option>
                 <option value="HOD">HOD</option>
                 <option value="SHIFT_WORKER">Shift Worker</option>
                 <option value="GENERAL_WORKER">General Worker</option>
@@ -216,7 +235,7 @@ function Register() {
           </div>
 
           <button type="submit" className="btn-submit" disabled={loading}>
-            {loading ? "Provisioning..." : "Provision Node"}
+            {loading ? "Provisioning..." : "Register Employee"}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="14"
@@ -235,7 +254,7 @@ function Register() {
         </form>
 
         <div className="auth-footer">
-          Already registered? <Link to="/">Establish link</Link>
+          Already registered? <Link to="/login">Sign in</Link>
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ import ThemeToggle from "./ThemeToggle";
 import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
 import api from "../api/axios";
+import { WS_BASE_URL } from "../config/api";
 
 const navItems = [
   { path: "/dashboard", label: "Machine Dashboard", icon: Cpu },
@@ -41,7 +42,7 @@ function DashboardLayout() {
 
   // WebSocket and REST fetching for global statistics & notifications
   useEffect(() => {
-    const socket = new SockJS("http://localhost:8000/ws");
+    const socket = new SockJS(WS_BASE_URL);
     const client = new Client({
       webSocketFactory: () => socket,
       onConnect: () => {

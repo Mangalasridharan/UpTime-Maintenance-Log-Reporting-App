@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: uptime-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-Uptime-Maintenance-log-reporting-app}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mangal@123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-Uptime-Maintenance-log-reporting-app}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: uptime-backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 8000
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-Uptime-Maintenance-log-reporting-app}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-mangal@123}
+      JWT_SECRET: ${JWT_SECRET:-VGhpc0lzQVN1cGVyU2VjcmV0S2V5Rm9ySldUU3ByaW5nQm9vdA==}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-1800000}
+      ADMIN_EMPLOYEE_NAME: ${ADMIN_EMPLOYEE_NAME:-mangal}
+      ADMIN_EMPLOYEE_PASSWORD: ${ADMIN_EMPLOYEE_PASSWORD:-mangal@123}
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:

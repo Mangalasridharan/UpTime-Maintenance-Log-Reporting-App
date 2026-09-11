@@ -24,10 +24,11 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 9999;
+  z-index: 99;
   background-color: var(--bg);
   background-image: 
     linear-gradient(var(--grid-line-color) 1px, transparent 1px),
+    
     linear-gradient(90deg, var(--grid-line-color) 1px, transparent 1px);
   background-size: 32px 32px;
   background-position: center;
