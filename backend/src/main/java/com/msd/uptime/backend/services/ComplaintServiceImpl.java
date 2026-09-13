@@ -41,13 +41,13 @@ public class ComplaintServiceImpl implements ComplaintService {
     }
 
     public Complaint createComplaint(ComplaintRequest complaint) {
-        Machine machine = machineRepository.findMachineById(complaint.getMachineId());
+        Machine machine = machineRepository.findMachineById(complaint.machineId());
         machine.setStatus(MachineStatus.IDLE);
         machineRepository.save(machine);
-        Employee reported_by = employeeRepository.getOne(complaint.getEmployeeId());
+        Employee reported_by = employeeRepository.getOne(complaint.employeeId());
 
         Complaint complaintEntry = new Complaint();
-        complaintEntry.setDescription(complaint.getDescription());
+        complaintEntry.setDescription(complaint.description());
         complaintEntry.setMachine(machine);
         complaintEntry.setReportedBy(reported_by);
         complaintEntry.setStatus(ComplaintStatus.OPEN);

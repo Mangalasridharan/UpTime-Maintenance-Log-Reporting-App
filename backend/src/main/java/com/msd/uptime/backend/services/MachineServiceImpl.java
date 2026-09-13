@@ -28,9 +28,9 @@ public class MachineServiceImpl implements MachineService {
 
     public Machine createMachine(MachineRequest machineRequest){
 
-        Department department = departmentRepository.findDepartmentById(machineRequest.getDepartmentId());
+        Department department = departmentRepository.findDepartmentById(machineRequest.departmentId());
         Machine machine = new Machine();
-        machine.setName(machineRequest.getName());
+        machine.setName(machineRequest.name());
         machine.setDepartment(department);
         Machine saved =  machineRepository.save(machine);
         listDashboardService.publishListDashboard();

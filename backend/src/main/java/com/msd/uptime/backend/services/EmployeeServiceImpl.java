@@ -53,20 +53,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public Employee register(EmployeeRegisterRequest employeeRegisterRequest){
-        Department department = departmentRepository.findDepartmentById(employeeRegisterRequest.getDepartmentId());
+        Department department = departmentRepository.findDepartmentById(employeeRegisterRequest.departmentId());
         System.out.println(department);
         Employee employee = new Employee();
-        employee.setUsername(employeeRegisterRequest.getUsername());
-        employee.setEmail(employeeRegisterRequest.getEmail());
-        employee.setPassword(encoder.encode(employeeRegisterRequest.getPassword()));
-        employee.setEmployeeRole(employeeRegisterRequest.getEmployeeRole());
+        employee.setUsername(employeeRegisterRequest.username());
+        employee.setEmail(employeeRegisterRequest.email());
+        employee.setPassword(encoder.encode(employeeRegisterRequest.password()));
+        employee.setEmployeeRole(employeeRegisterRequest.employeeRole());
         employee.setDepartment(department);
 
         if(employee.getEmployeeRole()==EmployeeRole.HEAD || employee.getEmployeeRole()==EmployeeRole.HOD){
             employee.setSpecialization(null);
         }
         else{
-            employee.setSpecialization(employeeRegisterRequest.getSpecialization());
+            employee.setSpecialization(employeeRegisterRequest.specialization());
         }
 
         return  employeeRepository.save(employee);
@@ -76,13 +76,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
+                        loginRequest.email(),
+                        loginRequest.password()
                 )
         );
 
         Employee employee = employeeRepository.findByEmail(
-                loginRequest.getEmail()
+                loginRequest.email()
         );
 
         return new EmployeeLoginResponse(
