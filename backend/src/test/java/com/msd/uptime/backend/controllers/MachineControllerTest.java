@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,8 +57,9 @@ class MachineControllerTest {
         mockMvc.perform(post("/uptime/api/v1/machines")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Lathe\",\"departmentId\":1}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Lathe"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.name").value("Lathe"));
     }
 
     @Test
@@ -69,7 +69,7 @@ class MachineControllerTest {
 
         mockMvc.perform(get("/uptime/api/v1/machines/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("RUNNING"));
+                .andExpect(jsonPath("$.data.status").value("RUNNING"));
     }
 
     @Test
@@ -79,14 +79,15 @@ class MachineControllerTest {
 
         mockMvc.perform(get("/uptime/api/v1/machines"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.data.length()").value(1));
     }
 
     @Test
     void deleteMachine_delegatesAndReturnsMessage() throws Exception {
         mockMvc.perform(delete("/uptime/api/v1/machines/8"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Machine Deleted Successfully!"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Machine Deleted Successfully!"));
 
         verify(machineService).deleteMachineById(8L);
     }
@@ -98,8 +99,8 @@ class MachineControllerTest {
 
         mockMvc.perform(get("/uptime/api/v1/machines/dashboard"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalMachines").value(5))
-                .andExpect(jsonPath("$.runningMachines").value(2));
+                .andExpect(jsonPath("$.data.totalMachines").value(5))
+                .andExpect(jsonPath("$.data.runningMachines").value(2));
     }
 
     @Test
@@ -109,6 +110,6 @@ class MachineControllerTest {
 
         mockMvc.perform(patch("/uptime/api/v1/machines/1/UNDER_MAINTENANCE"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("UNDER_MAINTENANCE"));
+                .andExpect(jsonPath("$.data.status").value("UNDER_MAINTENANCE"));
     }
 }

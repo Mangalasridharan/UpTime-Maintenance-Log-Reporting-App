@@ -6,7 +6,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class HomeControllerTest {
@@ -17,6 +17,7 @@ class HomeControllerTest {
 
         mockMvc.perform(get("/uptime/api/v1/home/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Welcome to Uptime Maintenance Log Reporting App"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Welcome to Uptime Maintenance Log Reporting App"));
     }
 }

@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,9 +49,10 @@ class DepartmentControllerTest {
         mockMvc.perform(post("/uptime/api/v1/departments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Mechanical\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Mechanical"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.name").value("Mechanical"));
     }
 
     @Test
@@ -62,7 +62,7 @@ class DepartmentControllerTest {
 
         mockMvc.perform(get("/uptime/api/v1/departments/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Mechanical"));
+                .andExpect(jsonPath("$.data.name").value("Mechanical"));
     }
 
     @Test
@@ -73,14 +73,15 @@ class DepartmentControllerTest {
 
         mockMvc.perform(get("/uptime/api/v1/departments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(jsonPath("$.data.length()").value(2));
     }
 
     @Test
     void deleteDepartment_delegatesAndReturnsMessage() throws Exception {
         mockMvc.perform(delete("/uptime/api/v1/departments/3"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Department deleted successfully"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Department deleted successfully"));
 
         verify(departmentService).deleteDepartmentById(anyLong());
     }

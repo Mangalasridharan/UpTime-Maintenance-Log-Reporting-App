@@ -4,9 +4,12 @@ import com.msd.uptime.backend.DTO.DashboardResponse;
 import com.msd.uptime.backend.DTO.MachineRequest;
 import com.msd.uptime.backend.models.Machine;
 import com.msd.uptime.backend.models.MachineStatus;
+import com.msd.uptime.backend.response.ApiResponse;
 import com.msd.uptime.backend.services.StatusDashboardService;
 import com.msd.uptime.backend.services.MachineService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,35 +27,36 @@ public class MachineController {
 
     @PreAuthorize("hasRole ('HEAD')")
     @PostMapping()
-    public Machine createMachine(@RequestBody MachineRequest machineRequest){
-        return machineService.createMachine(machineRequest);
+    public ResponseEntity<ApiResponse<Machine>> createMachine(@RequestBody MachineRequest machineRequest){
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Machine created successfully", machineService.createMachine(machineRequest)));
     }
 
     @GetMapping("/{id}")
-    public Machine getMachine(@PathVariable Long id){
-        return machineService.getMachineById(id);
+    public ResponseEntity<ApiResponse<Machine>> getMachine(@PathVariable Long id){
+        return ResponseEntity.ok(ApiResponse.success("Machine fetched successfully", machineService.getMachineById(id)));
     }
 
     @GetMapping()
-    public List<Machine> getAllMachines(){
-        return machineService.getAllMachines();
+    public ResponseEntity<ApiResponse<List<Machine>>> getAllMachines(){
+        return ResponseEntity.ok(ApiResponse.success("Machines fetched successfully", machineService.getAllMachines()));
     }
 
     @PreAuthorize("hasRole ('HEAD')")
     @DeleteMapping("/{id}")
-    public String deleteMachine(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<Void>> deleteMachine(@PathVariable Long id){
         machineService.deleteMachineById(id);
-        return "Machine Deleted Successfully!";
+        return ResponseEntity.ok(ApiResponse.<Void>success("Machine Deleted Successfully!", null));
     }
 
     @GetMapping("/dashboard")
-    public DashboardResponse getAllMachinesDashboard(){
-        return statusDashboardService.getStatusDashboard();
+    public ResponseEntity<ApiResponse<DashboardResponse>> getAllMachinesDashboard(){
+        return ResponseEntity.ok(ApiResponse.success("Dashboard fetched successfully", statusDashboardService.getStatusDashboard()));
     }
 
     @PatchMapping("/{id}/{status}")
-    public Machine updateMachineStatus(@PathVariable Long id, @PathVariable MachineStatus status){
-        return machineService.changeMachineStatus(id, status);
+    public ResponseEntity<ApiResponse<Machine>> updateMachineStatus(@PathVariable Long id, @PathVariable MachineStatus status){
+        return ResponseEntity.ok(ApiResponse.success("Machine status updated successfully", machineService.changeMachineStatus(id, status)));
     }
 
 }

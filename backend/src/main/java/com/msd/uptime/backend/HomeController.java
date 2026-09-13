@@ -1,5 +1,7 @@
 package com.msd.uptime.backend;
 
+import com.msd.uptime.backend.response.ApiResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -8,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController
 {
     @RequestMapping(value="/")
-    public String home()
+    public ResponseEntity<ApiResponse<String>> home()
     {
-        return "Welcome to Uptime Maintenance Log Reporting App";
+        return ResponseEntity.ok(ApiResponse.<String>success("Welcome to Uptime Maintenance Log Reporting App", null));
     }
 }

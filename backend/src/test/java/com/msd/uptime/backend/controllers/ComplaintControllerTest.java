@@ -19,7 +19,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -54,8 +53,9 @@ class ComplaintControllerTest {
                         .content("""
                                 {"description":"Belt snapped","machineId":1,"employeeId":2}
                                 """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("OPEN"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.status").value("OPEN"));
     }
 
     @Test
@@ -66,7 +66,7 @@ class ComplaintControllerTest {
 
         mockMvc.perform(patch("/uptime/api/v1/complaint/10/assign").param("id", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("ASSIGNED"));
+                .andExpect(jsonPath("$.data.status").value("ASSIGNED"));
     }
 
     @Test
@@ -77,7 +77,7 @@ class ComplaintControllerTest {
 
         mockMvc.perform(patch("/uptime/api/v1/complaint/10/resolve"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("COMPLETED"));
+                .andExpect(jsonPath("$.data.status").value("COMPLETED"));
     }
 
     @Test
@@ -88,7 +88,7 @@ class ComplaintControllerTest {
 
         mockMvc.perform(patch("/uptime/api/v1/complaint/10/verify"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("VERIFIED"));
+                .andExpect(jsonPath("$.data.status").value("VERIFIED"));
     }
 
     @Test
@@ -98,6 +98,6 @@ class ComplaintControllerTest {
 
         mockMvc.perform(get("/uptime/api/v1/complaint"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.data.length()").value(1));
     }
 }

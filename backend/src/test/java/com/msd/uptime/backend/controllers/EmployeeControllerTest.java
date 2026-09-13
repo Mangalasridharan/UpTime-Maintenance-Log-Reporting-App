@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,11 +53,12 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/uptime/api/v1/employee/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"username":"jano","email":"jano@test.com","password":"pass","employeeRole":"HEAD","departmentId":1}
+                                {"username":"jano","email":"jano@test.com","password":"Pass1","employeeRole":"HEAD","departmentId":1}
                                 """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("jano"))
-                .andExpect(jsonPath("$.email").value("jano@test.com"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.username").value("jano"))
+                .andExpect(jsonPath("$.data.email").value("jano@test.com"));
     }
 
     @Test
@@ -72,8 +72,9 @@ class EmployeeControllerTest {
                                 {"email":"jano@test.com","password":"pass"}
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.jwtToken").value("jwt-123"))
-                .andExpect(jsonPath("$.role").value("HEAD"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.jwtToken").value("jwt-123"))
+                .andExpect(jsonPath("$.data.role").value("HEAD"));
     }
 
     @Test
@@ -84,7 +85,7 @@ class EmployeeControllerTest {
 
         mockMvc.perform(get("/uptime/api/v1/employee/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("jano@test.com"));
+                .andExpect(jsonPath("$.data.email").value("jano@test.com"));
     }
 
     @Test
@@ -95,14 +96,15 @@ class EmployeeControllerTest {
 
         mockMvc.perform(get("/uptime/api/v1/employee"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.data.length()").value(1));
     }
 
     @Test
     void deleteUser_delegatesAndReturnsMessage() throws Exception {
         mockMvc.perform(delete("/uptime/api/v1/employee/4"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("User has been deleted"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("User has been deleted"));
 
         verify(employeeService).deleteUserById(4L);
     }

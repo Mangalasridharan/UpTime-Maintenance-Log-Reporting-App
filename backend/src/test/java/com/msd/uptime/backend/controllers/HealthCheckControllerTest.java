@@ -16,8 +16,9 @@ class HealthCheckControllerTest {
 
         mockMvc.perform(get("/health"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("UP"))
-                .andExpect(jsonPath("$.service").value("uptime-maintenance-backend"))
-                .andExpect(jsonPath("$.timestamp").exists());
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.status").value("UP"))
+                .andExpect(jsonPath("$.data.service").value("uptime-maintenance-backend"))
+                .andExpect(jsonPath("$.data.timestamp").exists());
     }
 }
