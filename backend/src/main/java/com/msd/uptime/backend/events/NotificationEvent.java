@@ -1,17 +1,22 @@
 package com.msd.uptime.backend.events;
 
-import com.msd.uptime.backend.models.Employee;
+import com.msd.uptime.backend.models.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.io.Serializable;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
-public class NotificationEvent {
-    private final Employee recipient;
+public class NotificationEvent implements Serializable {
 
-    private final String title;
+    private Long recipientId;
 
-    private final String message;
+    private String title;
+
+    private String message;
+
+    private NotificationType notificationType = NotificationType.IN_APP;
 }

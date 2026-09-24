@@ -9,10 +9,12 @@ import com.msd.uptime.backend.models.Employee;
 import com.msd.uptime.backend.models.EmployeeRole;
 import com.msd.uptime.backend.models.Machine;
 import com.msd.uptime.backend.models.MachineStatus;
+import com.msd.uptime.backend.models.MaintenanceLogs;
 import com.msd.uptime.backend.models.Specialization;
 import com.msd.uptime.backend.repositories.ComplaintRepository;
 import com.msd.uptime.backend.repositories.EmployeeRepository;
 import com.msd.uptime.backend.repositories.MachineRepository;
+import com.msd.uptime.backend.repositories.MaintenanceLogRepository;
 import com.msd.uptime.backend.support.TestDataFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,6 +55,9 @@ class ComplaintServiceImplTest {
     @Mock
     private ApplicationEventPublisher publisher;
 
+    @Mock
+    private MaintenanceLogRepository maintenanceLogRepository;
+
     @InjectMocks
     private ComplaintServiceImpl complaintService;
 
@@ -87,6 +92,7 @@ class ComplaintServiceImplTest {
 
         verify(machineRepository).save(machine);
         verify(complaintRepository).save(result);
+        verify(maintenanceLogRepository).save(any(MaintenanceLogs.class));
         verify(publisher).publishEvent(any(NotificationEvent.class));
         verify(listDashboardService).publishListDashboard();
         verify(complaintDashboardService).publishComplaintDashboard();

@@ -42,6 +42,19 @@
   color: var(--text-primary);
 }
 
+.landing-brand-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.demo-brand:hover .landing-brand-logo {
+  transform: scale(1.06);
+}
+
 .demo-header-actions {
   display: flex;
   align-items: center;

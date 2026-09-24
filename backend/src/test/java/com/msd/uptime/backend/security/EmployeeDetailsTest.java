@@ -19,7 +19,7 @@ class EmployeeDetailsTest {
         assertThat(details.getPassword()).isEqualTo(employee.getPassword());
         assertThat(details.getAuthorities())
                 .extracting("authority")
-                .containsExactly("HOD");
+                .containsExactly("ROLE_HOD");
         assertThat(details.isAccountNonExpired()).isTrue();
         assertThat(details.isAccountNonLocked()).isTrue();
         assertThat(details.isCredentialsNonExpired()).isTrue();

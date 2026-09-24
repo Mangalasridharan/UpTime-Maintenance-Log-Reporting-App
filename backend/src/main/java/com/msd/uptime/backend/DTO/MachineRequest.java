@@ -2,5 +2,6 @@ package com.msd.uptime.backend.DTO;
 
 public record MachineRequest(
         String name,
-        Long departmentId
+        Long departmentId,
+        Long operatorId
 ) {}

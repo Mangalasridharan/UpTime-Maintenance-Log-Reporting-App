@@ -107,9 +107,8 @@ function Profile() {
 
   return (
     <div className="dashboard-container" style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <div className="dashboard-title-area" style={{ marginBottom: '2rem' }}>
-        <h1 style={{ margin: 0, fontSize: '1.75rem' }}>Employee Node Profile</h1>
-        <p style={{ margin: 0, fontSize: '0.875rem' }}>Secure registry details for the logged-in system operator.</p>
+      <div className="dashboard-title-area" style={{ marginBottom: '0.75rem' }}>
+        <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Profile Details</h1>
       </div>
 
       {profile && (

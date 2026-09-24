@@ -1,17 +1,19 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   useReactTable, 
   getCoreRowModel, 
   getPaginationRowModel,
   flexRender 
 } from '@tanstack/react-table';
-import { Search, ChevronLeft, ChevronRight, SlidersHorizontal, X, LayoutGrid, List } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, List } from 'lucide-react';
 import api from "../api/axios";
 import SockJS from "sockjs-client/dist/sockjs";
 import {Client} from "@stomp/stompjs";
 import { WS_BASE_URL } from "../config/api";
 
 function Machines() {
+  const navigate = useNavigate();
   const [machines, setMachines] = useState([]);
   const [machineStatus, setMachineStatus] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,14 +25,6 @@ function Machines() {
     pageIndex: 0,
     pageSize: localStorage.getItem("machines_view_mode") === "card" ? 9 : 6,
   });
-
-  // Modal / Detail States
-  const [selectedMachine, setSelectedMachine] = useState(null);
-  const [isComplaintFormOpen, setIsComplaintFormOpen] = useState(false);
-  const [complaintText, setComplaintText] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
 
   const previousMachines = useRef([]);
 
@@ -90,15 +84,9 @@ function Machines() {
     getMachineListResponse();
   }, []);
 
-  // Sync selectedMachine state whenever machines array is updated via WS or REST
-  useEffect(() => {
-    if (selectedMachine) {
-      const updated = machines.find(m => m.id === selectedMachine.id);
-      if (updated) {
-        setSelectedMachine(updated);
-      }
-    }
-  }, [machines]);
+  const openMachine = (machine) => {
+    navigate(`/dashboard/machines/${machine.id}`);
+  };
 
   // Filter logic combining search and status select
   const filteredMachines = useMemo(() => {
@@ -118,8 +106,8 @@ function Machines() {
   // Helper to render consistent status badges with dynamic animation highlights
   const renderStatusBadge = (val) => {
     let className = 'status-badge ';
-    let label = '';
-    let indicator = null;
+    let label;
+    let indicator;
     
     if (val === 'RUNNING') {
       className += 'status-running';
@@ -207,112 +195,57 @@ function Machines() {
     }));
   };
 
-  const closeModal = () => {
-    setSelectedMachine(null);
-    setIsComplaintFormOpen(false);
-    setComplaintText("");
-    setIsSuccess(false);
-    setErrorMsg("");
-    setSubmitting(false);
-  };
-
-  const handleComplaintSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedMachine) return;
-    setErrorMsg("");
-    setSubmitting(true);
-
-    try {
-      let empId = localStorage.getItem("employeeId");
-
-      if (!empId) {
-        const storedEmail = localStorage.getItem("email");
-        const storedUsername = localStorage.getItem("username");
-        const employeeRes = await api.get("/v1/employee");
-        const allEmployees = employeeRes.data || [];
-        const matched = allEmployees.find(
-          emp => emp.email === storedEmail || emp.username === storedUsername
-        );
-        if (matched && matched.id) {
-          empId = matched.id;
-          localStorage.setItem("employeeId", matched.id);
-        }
-      }
-
-      await api.post("/v1/complaint", {
-        description: complaintText,
-        machineId: selectedMachine.id,
-        employeeId: empId ? Number(empId) : null,
-      });
-
-      setSelectedMachine(prev => prev ? { ...prev, status: "IDLE" } : prev);
-      setIsSuccess(true);
-      setTimeout(() => {
-        closeModal();
-      }, 2000);
-    } catch (err) {
-      console.error("Error submitting complaint:", err);
-      setErrorMsg(
-        err.response?.data?.message || "Failed to submit complaint. Please try again."
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <div>
-      <div className="table-section-header">
-        <h2 className="table-section-title">Equipment Machine Registry</h2>
-        <p className="table-section-desc">Manage, search, and monitor department-wide telemetry and machine configurations.</p>
-      </div>
-
-      {/* Modern Filter bar */}
-      <div className="filter-bar">
-        <div className="filter-search-container">
-          <Search size={16} className="search-icon-inside" />
-          <input
-            type="text"
-            className="filter-search-input"
-            placeholder="Search machines or depts..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      {/* Search Bar Above Filter & View Toggle */}
+      <div className="dashboard-controls">
+        <div className="dashboard-search-row">
+          <div className="filter-search-container">
+            <Search size={16} className="search-icon-inside" />
+            <input
+              type="text"
+              className="filter-search-input"
+              placeholder="Search machines or depts..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <SlidersHorizontal size={14} style={{ color: 'var(--text-secondary)' }} />
-          <select 
-            name="status" 
-            className="filter-select"
-            value={machineStatus} 
-            onChange={(e) => setMachineStatus(e.target.value)}
-          >
-            <option value="ALL">All States</option>
-            <option value="RUNNING">Running</option>
-            <option value="IDLE">Idle</option>
-            <option value="UNDER_MAINTENANCE">Maintenance</option>
-          </select>
+        <div className="dashboard-filters-row">
+          <div className="dashboard-filters-group">
+            <select 
+              name="status" 
+              className="filter-select"
+              value={machineStatus} 
+              onChange={(e) => setMachineStatus(e.target.value)}
+            >
+              <option value="ALL">All States</option>
+              <option value="RUNNING">Running</option>
+              <option value="IDLE">Idle</option>
+              <option value="UNDER_MAINTENANCE">Maintenance</option>
+            </select>
 
-          <div className="view-toggle-group">
-            <button 
-              type="button" 
-              className={`btn-view-toggle ${viewMode === 'table' ? 'active' : ''}`}
-              onClick={() => handleViewModeChange('table')}
-              aria-label="Table View"
-              title="Table View"
-            >
-              <List size={16} />
-            </button>
-            <button 
-              type="button" 
-              className={`btn-view-toggle ${viewMode === 'card' ? 'active' : ''}`}
-              onClick={() => handleViewModeChange('card')}
-              aria-label="Card View"
-              title="Card View"
-            >
-              <LayoutGrid size={16} />
-            </button>
+            <div className="view-toggle-group">
+              <button 
+                type="button" 
+                className={`btn-view-toggle ${viewMode === 'table' ? 'active' : ''}`}
+                onClick={() => handleViewModeChange('table')}
+                aria-label="Table View"
+                title="Table View"
+              >
+                <List size={16} />
+              </button>
+              <button 
+                type="button" 
+                className={`btn-view-toggle ${viewMode === 'card' ? 'active' : ''}`}
+                onClick={() => handleViewModeChange('card')}
+                aria-label="Card View"
+                title="Card View"
+              >
+                <LayoutGrid size={16} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -349,7 +282,7 @@ function Machines() {
                 table.getRowModel().rows.map(row => (
                   <tr 
                     key={row.id} 
-                    onClick={() => setSelectedMachine(row.original)}
+                    onClick={() => openMachine(row.original)}
                     style={{ cursor: 'pointer' }}
                     title="Open Machine Details"
                   >
@@ -386,7 +319,7 @@ function Machines() {
                 <div 
                   key={row.id}
                   className="machine-card" 
-                  onClick={() => setSelectedMachine(machine)}
+                  onClick={() => openMachine(machine)}
                   title="Open Machine Details"
                 >
                   <div className="machine-card-header">
@@ -438,82 +371,6 @@ function Machines() {
               Next
               <ChevronRight size={14} />
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Machine Details & Complaint Pop-up Modal */}
-      {selectedMachine && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Machine Telemetry Details</h3>
-              <button className="btn-close" onClick={closeModal} aria-label="Close details">
-                <X size={18} />
-              </button>
-            </div>
-            
-            <div className="modal-body">
-              <div className="detail-row">
-                <span className="detail-label">Machine Name</span>
-                <span className="detail-value">{selectedMachine.name}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Current Status</span>
-                <span className="detail-value">
-                  {renderStatusBadge(selectedMachine.status)}
-                </span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Department</span>
-                <span className="detail-value">
-                  <span className="dept-tag">
-                    {selectedMachine.department?.name || 'Unassigned'}
-                  </span>
-                </span>
-              </div>
-
-              <hr className="modal-divider" />
-
-              {isSuccess ? (
-                <div className="complaint-success-message">
-                  <span>✓</span> Complaint raised successfully for this machine.
-                </div>
-              ) : isComplaintFormOpen ? (
-                <form onSubmit={handleComplaintSubmit} className="complaint-form">
-                  {errorMsg && <div className="error-message" style={{ marginBottom: '1rem', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem' }}>{errorMsg}</div>}
-                  <label htmlFor="complaint-desc">COMPLAINT STATEMENT</label>
-                  <textarea
-                    id="complaint-desc"
-                    placeholder="Provide details about the malfunction or service request..."
-                    value={complaintText}
-                    onChange={(e) => setComplaintText(e.target.value)}
-                    required
-                    disabled={submitting}
-                  />
-                  <div className="form-actions">
-                    <button 
-                      type="button" 
-                      className="btn-cancel" 
-                      onClick={() => setIsComplaintFormOpen(false)}
-                      disabled={submitting}
-                    >
-                      Cancel
-                    </button>
-                    <button type="submit" className="btn-submit-complaint" disabled={submitting}>
-                      {submitting ? "Submitting..." : "Submit Complaint"}
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <button 
-                  className="btn-raise-complaint" 
-                  onClick={() => setIsComplaintFormOpen(true)}
-                >
-                  Raise Complaint
-                </button>
-              )}
-            </div>
           </div>
         </div>
       )}

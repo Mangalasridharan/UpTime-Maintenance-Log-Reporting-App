@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
-  Cpu, MessageSquare, Users, LogOut, Menu, X, User, LayoutDashboard,
+  Cpu, MessageSquare, Users, LogOut, Menu, X, User,
   Bell, Trash2, CheckCheck, AlertTriangle, CheckCircle2, Info,
-  Maximize2, Minimize2, Search, Inbox
+  Maximize2, Minimize2, Search, Inbox, PanelLeftClose
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
 import api from "../api/axios";
-import { WS_BASE_URL } from "../config/api";
+import { API_BASE_URL, WS_BASE_URL } from "../config/api";
+import uptimeLogo from "../assets/uptime.png";
 
 const navItems = [
   { path: "/dashboard", label: "Machine Dashboard", icon: Cpu },
@@ -25,6 +26,25 @@ function DashboardLayout() {
   // Sidebar State (mobile and hover triggers)
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarHovered, setSidebarHovered] = useState(false);
+  const [isHoverDisabled, setIsHoverDisabled] = useState(false);
+
+  const handleMinimizeNavbar = (e) => {
+    if (e) e.stopPropagation();
+    setSidebarOpen(false);
+    setSidebarHovered(false);
+    setIsHoverDisabled(true);
+  };
+
+  const handleMouseLeaveSidebar = () => {
+    setSidebarHovered(false);
+    setIsHoverDisabled(false);
+  };
+
+  const handleMouseEnterSidebar = () => {
+    if (!isHoverDisabled) {
+      setSidebarHovered(true);
+    }
+  };
 
   // Global Machine Status Statistics State
   const [totalMachines, setTotalMachines] = useState(0);
@@ -39,6 +59,31 @@ function DashboardLayout() {
   const [notifSearch, setNotifSearch] = useState("");
 
   const [notifications, setNotifications] = useState([]);
+
+  // Browser-level push notifications (Notification API)
+  const showBrowserPush = (notif) => {
+    if (notif && notif.notificationType === "PUSH" && "Notification" in window) {
+      if (Notification.permission === "granted") {
+        new Notification(notif.title || "UpTime", {
+          body: notif.message || "",
+          icon: "/favicon.ico",
+        });
+      }
+    }
+  };
+
+  // Browsers only allow the permission prompt from a user gesture (e.g. a click).
+  const requestPushPermission = () => {
+    if (!("Notification" in window)) return;
+    if (Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  };
+
+  const handleBellClick = () => {
+    setNotifOpen(true);
+    requestPushPermission();
+  };
 
   // WebSocket and REST fetching for global statistics & notifications
   useEffect(() => {
@@ -67,61 +112,44 @@ function DashboardLayout() {
           console.log("DashboardLayout Notification WS received:", message.body);
           try {
             const data = JSON.parse(message.body);
-            // Payload structure: { recipient: Employee, title: string, message: string }
+            // Payload structure: { id, title, message, notificationType, recipientId, read, createdAt }
 
-            const isForCurrentUser = (recipient) => {
-              if (!recipient) return true;
-              const curUser = (localStorage.getItem("username") || "").toLowerCase();
-              const curEmail = (localStorage.getItem("email") || "").toLowerCase();
-              const curName = (localStorage.getItem("name") || "").toLowerCase();
-              const curId = String(localStorage.getItem("userId") || localStorage.getItem("id") || "");
+            const curId = String(
+              localStorage.getItem("employeeId") ||
+              localStorage.getItem("userId") ||
+              localStorage.getItem("id") || ""
+            );
 
-              if (typeof recipient === "string") {
-                const rec = recipient.toLowerCase();
-                return !curUser || rec === curUser || rec === curEmail || rec === curName || rec === curId;
+            const recipientId = data.recipientId ? String(data.recipientId) : "";
+            if (curId && recipientId && recipientId !== curId) return;
+
+            let type = data.type || "info";
+            if (!data.type) {
+              const fullText = `${data.title || ''} ${data.message || ''}`.toLowerCase();
+              if (fullText.includes("critical") || fullText.includes("overheating") || fullText.includes("error") || fullText.includes("fail") || fullText.includes("breakdown")) {
+                type = "critical";
+              } else if (fullText.includes("warning") || fullText.includes("alert") || fullText.includes("idle") || fullText.includes("complaint")) {
+                type = "warning";
+              } else if (fullText.includes("success") || fullText.includes("completed") || fullText.includes("resolved") || fullText.includes("fixed")) {
+                type = "success";
               }
-              if (typeof recipient === "object") {
-                const recUser = (recipient.username || "").toLowerCase();
-                const recEmail = (recipient.email || "").toLowerCase();
-                const recName = (recipient.name || "").toLowerCase();
-                const recId = String(recipient.id || "");
-                return (
-                  !curUser ||
-                  (recUser && recUser === curUser) ||
-                  (recEmail && recEmail === curEmail) ||
-                  (recName && recName === curName) ||
-                  (recId && recId === curId) ||
-                  (!recUser && !recEmail && !recName && !recId)
-                );
-              }
-              return true;
+            }
+
+            const newNotif = {
+              id: data.id || Date.now() + Math.random(),
+              title: data.title || "Notification",
+              message: data.message || "",
+              recipient: data.recipient || null,
+              notificationType: data.notificationType || "IN_APP",
+              time: data.createdAt
+                ? new Date(data.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              type: type,
+              read: data.read || false,
             };
 
-            if (isForCurrentUser(data.recipient)) {
-              let type = data.type || "info";
-              if (!data.type) {
-                const fullText = `${data.title || ''} ${data.message || ''}`.toLowerCase();
-                if (fullText.includes("critical") || fullText.includes("overheating") || fullText.includes("error") || fullText.includes("fail") || fullText.includes("breakdown")) {
-                  type = "critical";
-                } else if (fullText.includes("warning") || fullText.includes("alert") || fullText.includes("idle") || fullText.includes("complaint")) {
-                  type = "warning";
-                } else if (fullText.includes("success") || fullText.includes("completed") || fullText.includes("resolved") || fullText.includes("fixed")) {
-                  type = "success";
-                }
-              }
-
-              const newNotif = {
-                id: data.id || Date.now() + Math.random(),
-                title: data.title || "Notification",
-                message: data.message || "",
-                recipient: data.recipient || null,
-                time: data.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                type: type,
-                read: false,
-              };
-
-              setNotifications((prev) => [newNotif, ...prev]);
-            }
+            setNotifications((prev) => [newNotif, ...prev]);
+            showBrowserPush(newNotif);
           } catch (e) {
             console.error("Error parsing WS notification:", e);
           }
@@ -133,6 +161,37 @@ function DashboardLayout() {
     return () => {
       client.deactivate();
     };
+  }, []);
+
+  // SSE push notification stream (Server-Sent Events)
+  useEffect(() => {
+    const employeeId = localStorage.getItem("employeeId") ||
+                       localStorage.getItem("userId") ||
+                       localStorage.getItem("id");
+    if (!employeeId) return;
+
+    const evtSource = new EventSource(`${API_BASE_URL}/v1/notifications/stream/${employeeId}`);
+
+    evtSource.addEventListener("notification", (e) => {
+      console.log("SSE push notification received:", e.data);
+      try {
+        const data = JSON.parse(e.data);
+        showBrowserPush({
+          title: data.title || "Push Notification",
+          message: data.message || "",
+          notificationType: "PUSH",
+        });
+      } catch (err) {
+        console.error("Error parsing SSE push notification:", err);
+      }
+    });
+
+    evtSource.onerror = () => {
+      // EventSource reconnects automatically; log quietly.
+      console.warn("SSE push stream disconnected, reconnecting...");
+    };
+
+    return () => evtSource.close();
   }, []);
 
   useEffect(() => {
@@ -195,7 +254,7 @@ function DashboardLayout() {
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  const isSidebarActive = sidebarOpen || sidebarHovered;
+  const isSidebarActive = !isHoverDisabled && (sidebarOpen || sidebarHovered);
 
   const renderNotifIcon = (type) => {
     switch (type) {
@@ -221,6 +280,9 @@ function DashboardLayout() {
         <div className="notif-item-title-block">
           {renderNotifIcon(notif.type)}
           <span className="notif-item-title">{notif.title}</span>
+          {notif.notificationType === "PUSH" && (
+            <span className="notif-type-badge push">PUSH</span>
+          )}
         </div>
         <span className="notif-item-time">{notif.time}</span>
       </div>
@@ -252,20 +314,30 @@ function DashboardLayout() {
       {/* Invisible hover trigger zone on the left edge of the screen */}
       <div 
         className="sidebar-hover-trigger"
-        onMouseEnter={() => setSidebarHovered(true)}
+        onMouseEnter={() => {
+          if (!isHoverDisabled) setSidebarHovered(true);
+        }}
       />
 
       {/* Slide-out Sidebar (Restored original design) */}
       <aside 
         className={`sidebar ${isSidebarActive ? "sidebar-open" : ""}`}
-        onMouseEnter={() => setSidebarHovered(true)}
-        onMouseLeave={() => setSidebarHovered(false)}
+        onMouseEnter={handleMouseEnterSidebar}
+        onMouseLeave={handleMouseLeaveSidebar}
       >
         <div className="sidebar-header">
-          <LayoutDashboard size={22} />
-          <span className="sidebar-brand">UpTime</span>
-          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
-            <X size={18} />
+          <div className="sidebar-brand-group">
+            <img src={uptimeLogo} alt="UpTime" className="sidebar-brand-logo" />
+            <span className="sidebar-brand">UpTime</span>
+          </div>
+          <button 
+            type="button"
+            className="sidebar-minimize-btn" 
+            onClick={handleMinimizeNavbar} 
+            title="Minimise Navbar"
+            aria-label="Minimise Navbar"
+          >
+            <PanelLeftClose size={18} />
           </button>
         </div>
 
@@ -278,8 +350,7 @@ function DashboardLayout() {
                 className={`sidebar-nav-item ${isActive(item.path) ? "active" : ""}`}
                 onClick={() => { 
                   navigate(item.path); 
-                  setSidebarOpen(false); 
-                  setSidebarHovered(false); 
+                  handleMinimizeNavbar();
                 }}
               >
                 <Icon size={18} />
@@ -294,8 +365,7 @@ function DashboardLayout() {
             className="sidebar-user" 
             onClick={() => {
               navigate("/dashboard/profile");
-              setSidebarOpen(false);
-              setSidebarHovered(false);
+              handleMinimizeNavbar();
             }}
             style={{ cursor: "pointer" }}
             title="View Profile Details"
@@ -315,18 +385,25 @@ function DashboardLayout() {
       </aside>
 
       {/* Dimmed Overlay for mobile sidebar lock */}
-      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={handleMinimizeNavbar} />}
 
       {/* Top Navbar & Main Content Area (Restored original design) */}
       <div className="main-area">
         <header className="top-navbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button className="hamburger-btn" onClick={() => setSidebarOpen(true)} title="Open Navigation Menu">
+            <button 
+              className="hamburger-btn" 
+              onClick={() => {
+                setIsHoverDisabled(false);
+                setSidebarOpen(true);
+              }} 
+              title="Open Navigation Menu"
+            >
               <Menu size={20} />
             </button>
             
             <div className="navbar-brand-section">
-              <span className="navbar-logo-icon">▲</span>
+              <img src={uptimeLogo} alt="UpTime" className="navbar-brand-logo" />
               <span className="navbar-brand-name">UpTime Console</span>
             </div>
           </div>
@@ -372,7 +449,7 @@ function DashboardLayout() {
             <ThemeToggle />
             <button 
               className={`notif-toggle-btn ${unreadCount > 0 ? "has-unread" : ""}`} 
-              onClick={() => setNotifOpen(true)}
+              onClick={handleBellClick}
               title={`${unreadCount} unread notifications`}
             >
               <Bell size={18} />

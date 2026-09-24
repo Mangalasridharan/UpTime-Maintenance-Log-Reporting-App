@@ -181,21 +181,22 @@ function ComplaintDashboard() {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-title-area">
-        <h1>Complaint Dashboard</h1>
-        <p>Track and manage maintenance complaints and service requests.</p>
+      <div className="dashboard-title-area" style={{ marginBottom: "0.75rem" }}>
+        <h1 style={{ margin: 0, fontSize: "1.5rem" }}>Complaint Dashboard</h1>
       </div>
 
-      <div className="filter-bar">
-        <div className="filter-search-container">
-          <Search size={16} className="search-icon-inside" />
-          <input
-            type="text"
-            className="filter-search-input"
-            placeholder="Search complaints..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <div className="dashboard-controls">
+        <div className="dashboard-search-row">
+          <div className="filter-search-container">
+            <Search size={16} className="search-icon-inside" />
+            <input
+              type="text"
+              className="filter-search-input"
+              placeholder="Search complaints..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 

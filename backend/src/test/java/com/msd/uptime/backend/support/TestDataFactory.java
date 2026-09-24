@@ -8,6 +8,7 @@ import com.msd.uptime.backend.models.EmployeeRole;
 import com.msd.uptime.backend.models.Machine;
 import com.msd.uptime.backend.models.MachineStatus;
 import com.msd.uptime.backend.models.Notification;
+import com.msd.uptime.backend.models.NotificationType;
 import com.msd.uptime.backend.models.Specialization;
 
 import java.time.LocalDateTime;
@@ -40,7 +41,12 @@ public final class TestDataFactory {
 
     public static Machine machine(Long id, String name, MachineStatus status,
                                   Department department) {
-        return new Machine(id, name, status, department);
+        return new Machine(id, name, status, department, null);
+    }
+
+    public static Machine machine(Long id, String name, MachineStatus status,
+                                  Department department, Employee operator) {
+        return new Machine(id, name, status, department, operator);
     }
 
     public static Complaint complaint(Long id, String description, Machine machine,
@@ -52,6 +58,6 @@ public final class TestDataFactory {
 
     public static Notification notification(Long id, Employee recipient, String title,
                                             String message, boolean read) {
-        return new Notification(id, recipient, title, message, read, FIXED_TIME);
+        return new Notification(id, recipient, title, message, NotificationType.IN_APP, read, FIXED_TIME);
     }
 }

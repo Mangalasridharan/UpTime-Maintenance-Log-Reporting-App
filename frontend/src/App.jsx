@@ -6,6 +6,7 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import DashboardLayout from "./component/DashboardLayout.jsx";
 import MachineDashboard from "./pages/MachineDashboard.jsx";
+import MachineDetails from "./pages/MachineDetails.jsx";
 import ComplaintDashboard from "./pages/ComplaintDashboard.jsx";
 import WorkerDashboard from "./pages/WorkerDashboard.jsx";
 import AssignWorker from "./pages/AssignWorker.jsx";
@@ -21,6 +22,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<MachineDashboard />} />
+          <Route path="machines/:id" element={<MachineDetails />} />
           <Route path="complaints" element={<ComplaintDashboard />} />
           <Route path="complaints/:id/assign" element={<AssignWorker />} />
           <Route path="workers" element={<WorkerDashboard />} />

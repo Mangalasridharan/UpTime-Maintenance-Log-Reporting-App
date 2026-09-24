@@ -2,6 +2,7 @@ package com.msd.uptime.backend.controllers;
 
 import com.msd.uptime.backend.DTO.DashboardResponse;
 import com.msd.uptime.backend.DTO.MachineRequest;
+import com.msd.uptime.backend.DTO.MachineWorkHistory;
 import com.msd.uptime.backend.models.Machine;
 import com.msd.uptime.backend.models.MachineStatus;
 import com.msd.uptime.backend.services.MachineService;
@@ -80,6 +81,20 @@ class MachineControllerTest {
         mockMvc.perform(get("/uptime/api/v1/machines"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(1));
+    }
+
+    @Test
+    void getMachineWorkHistory_delegatesToService() throws Exception {
+        MachineWorkHistory history = new MachineWorkHistory(
+                TestDataFactory.machine(1L, "Lathe", MachineStatus.RUNNING, null),
+                List.of(),
+                List.of());
+        when(machineService.getMachineWorkHistory(1L)).thenReturn(history);
+
+        mockMvc.perform(get("/uptime/api/v1/machines/1/history"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.machine.name").value("Lathe"))
+                .andExpect(jsonPath("$.data.complaints.length()").value(0));
     }
 
     @Test

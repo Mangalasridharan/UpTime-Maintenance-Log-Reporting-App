@@ -1,11 +1,16 @@
 package com.msd.uptime.backend.services;
 
 import com.msd.uptime.backend.DTO.MachineRequest;
+import com.msd.uptime.backend.DTO.MachineWorkHistory;
 import com.msd.uptime.backend.models.Department;
+import com.msd.uptime.backend.models.Employee;
 import com.msd.uptime.backend.models.Machine;
 import com.msd.uptime.backend.models.MachineStatus;
+import com.msd.uptime.backend.repositories.ComplaintRepository;
 import com.msd.uptime.backend.repositories.DepartmentRepository;
+import com.msd.uptime.backend.repositories.EmployeeRepository;
 import com.msd.uptime.backend.repositories.MachineRepository;
+import com.msd.uptime.backend.repositories.MaintenanceLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +26,15 @@ public class MachineServiceImpl implements MachineService {
     private MachineRepository machineRepository;
 
     @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private ComplaintRepository complaintRepository;
+
+    @Autowired
+    private MaintenanceLogRepository maintenanceLogRepository;
+
+    @Autowired
     private StatusDashboardService statusDashboardService;
 
     @Autowired
@@ -32,6 +46,10 @@ public class MachineServiceImpl implements MachineService {
         Machine machine = new Machine();
         machine.setName(machineRequest.name());
         machine.setDepartment(department);
+        if (machineRequest.operatorId() != null) {
+            Employee operator = employeeRepository.findById(machineRequest.operatorId()).orElse(null);
+            machine.setOperator(operator);
+        }
         Machine saved =  machineRepository.save(machine);
         listDashboardService.publishListDashboard();
         return saved;
@@ -59,6 +77,18 @@ public class MachineServiceImpl implements MachineService {
         statusDashboardService.publishStatusDashboard();
         listDashboardService.publishListDashboard();
         return machine;
+    }
+
+    public MachineWorkHistory getMachineWorkHistory(Long id){
+        Machine machine = getMachineById(id);
+        if (machine == null) {
+            return null;
+        }
+        return new MachineWorkHistory(
+                machine,
+                complaintRepository.findByMachineIdOrderByReportedAtDesc(id),
+                maintenanceLogRepository.findByMachineIdOrderByReportedAtDesc(id)
+        );
     }
 
 }

@@ -1,6 +1,7 @@
 package com.msd.uptime.backend.services;
 import com.msd.uptime.backend.DTO.DashboardResponse;
 import com.msd.uptime.backend.DTO.MachineRequest;
+import com.msd.uptime.backend.DTO.MachineWorkHistory;
 import com.msd.uptime.backend.models.Machine;
 import com.msd.uptime.backend.models.MachineStatus;
 
@@ -12,4 +13,5 @@ public interface MachineService {
     Machine getMachineById(Long id);
     void deleteMachineById(Long id);
     Machine changeMachineStatus(Long id, MachineStatus machineStatus);
+    MachineWorkHistory getMachineWorkHistory(Long id);
 }

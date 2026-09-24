@@ -17,6 +17,24 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: uptime-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -25,6 +43,8 @@ services:
     restart: always
     depends_on:
       postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     environment:
       PORT: 8000
@@ -35,8 +55,13 @@ services:
       JWT_EXPIRATION: ${JWT_EXPIRATION:-1800000}
       ADMIN_EMPLOYEE_NAME: ${ADMIN_EMPLOYEE_NAME:-mangal}
       ADMIN_EMPLOYEE_PASSWORD: ${ADMIN_EMPLOYEE_PASSWORD:-mangal@123}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS:-guest}
     ports:
       - "8000:8000"
 
 volumes:
   postgres_data:
+  rabbitmq_data:

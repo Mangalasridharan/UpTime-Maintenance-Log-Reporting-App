@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
 
 /* Base Styles */
 .auth-page {
-  --font-sans: 'Google Sans', 'Space Grotesk', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist_Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --bg: var(--bg-primary); 
   --border: var(--border-color);
   --text-main: var(--text-primary);
@@ -28,7 +28,6 @@
   background-color: var(--bg);
   background-image: 
     linear-gradient(var(--grid-line-color) 1px, transparent 1px),
-    
     linear-gradient(90deg, var(--grid-line-color) 1px, transparent 1px);
   background-size: 32px 32px;
   background-position: center;
@@ -36,9 +35,10 @@
   font-family: var(--font-sans);
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* Bring panels to the left side */
-  padding-left: 8%; /* Elegant spacing from the left screen edge */
+  justify-content: center;
+  padding: 2rem 1.5rem;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 /* Green Theme for Login Page */
@@ -59,12 +59,10 @@
   --grid-line-color: rgba(37, 99, 235, 0.02);
 }
 
-/* Responsive alignment - Center on mobile/tablet */
-@media (max-width: 900px) {
+/* Responsive adjustments */
+@media (max-width: 640px) {
   .auth-page {
-    justify-content: center;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    padding: 5rem 1rem 2rem;
   }
 }
 
@@ -83,8 +81,15 @@
     0 4px 6px -4px rgba(0, 0, 0, 0.02),
     0 25px 50px -12px rgba(0, 0, 0, 0.04);
   position: relative;
+  margin: auto;
   overflow: hidden;
   animation: authFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 2rem 1.5rem;
+  }
 }
 
 /* Size differentiation for Login vs Register card */
@@ -117,6 +122,32 @@
 
 .auth-logo:hover {
   transform: scale(1.05);
+}
+
+.auth-custom-logo {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-shadow: 0 8px 24px var(--theme-glow);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.auth-custom-logo:hover {
+  transform: scale(1.06);
+  box-shadow: 0 12px 28px var(--theme-glow);
+}
+
+.auth-custom-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .auth-card-header {
@@ -160,12 +191,12 @@
 .form-group label {
   display: block;
   font-family: var(--font-sans);
-  font-size: 0.825rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 700;
   color: var(--text-main);
   margin-bottom: 0.5rem;
-  letter-spacing: normal;
-  text-transform: none;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .form-input-container {
@@ -197,6 +228,7 @@
 
 .form-input::placeholder {
   color: var(--text-muted);
+  opacity: 0.55;
 }
 
 .password-toggle-btn {
@@ -282,6 +314,19 @@
 
 .btn-submit:hover svg {
   transform: translateX(2px);
+}
+
+.btn-spinner {
+  animation: btnSpin 1s linear infinite;
+}
+
+@keyframes btnSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Auth footer */

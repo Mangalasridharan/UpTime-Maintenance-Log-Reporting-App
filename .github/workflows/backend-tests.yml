@@ -33,12 +33,24 @@ jobs:
           --health-timeout 5s
           --health-retries 10
 
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5672:5672
+
     env:
       DB_HOST: localhost
       DB_PORT: 5432
       DB_NAME: uptime_test
       DB_USER: postgres
       DB_PASSWORD: postgres
+      RABBITMQ_HOST: localhost
+      RABBITMQ_PORT: 5672
 
     defaults:
       run:

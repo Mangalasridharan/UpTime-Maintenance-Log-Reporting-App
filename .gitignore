@@ -9,3 +9,5 @@ Details/
 .env.*.local
 *.iml
 .vscode/
+uploads/
+**/uploads/

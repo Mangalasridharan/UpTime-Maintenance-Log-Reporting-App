@@ -1,6 +1,7 @@
 package com.msd.uptime.backend.filters;
 
 import com.msd.uptime.backend.services.JWTService;
+import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,6 +90,22 @@ class JwtAuthFilterTest {
         jwtAuthFilter.doFilter(request, response, chain);
 
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    }
+
+    @Test
+    void malformedToken_doesNotThrowAndPassesThroughUnauthenticated() throws Exception {
+        when(jwtService.extractLoginIdentifier("not-a-jwt"))
+                .thenThrow(new MalformedJwtException("Invalid compact JWT string"));
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Authorization", "Bearer not-a-jwt");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain chain = new MockFilterChain();
+
+        jwtAuthFilter.doFilter(request, response, chain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verifyNoInteractions(userDetailsService);
     }
 
     @Test

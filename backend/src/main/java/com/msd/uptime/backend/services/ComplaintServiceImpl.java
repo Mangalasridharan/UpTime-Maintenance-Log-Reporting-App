@@ -6,6 +6,7 @@ import com.msd.uptime.backend.models.*;
 import com.msd.uptime.backend.repositories.ComplaintRepository;
 import com.msd.uptime.backend.repositories.EmployeeRepository;
 import com.msd.uptime.backend.repositories.MachineRepository;
+import com.msd.uptime.backend.repositories.MaintenanceLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,9 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    @Autowired
+    private MaintenanceLogRepository maintenanceLogRepository;
+
     public List<Complaint> getAllComplaints(){
         return complaintRepository.findAll();
     }
@@ -53,12 +57,22 @@ public class ComplaintServiceImpl implements ComplaintService {
         complaintEntry.setStatus(ComplaintStatus.OPEN);
         Complaint saved =  complaintRepository.save(complaintEntry);
 
+        MaintenanceLogs maintenanceLog = new MaintenanceLogs();
+        maintenanceLog.setMachine(machine);
+        maintenanceLog.setReportedBy(reported_by);
+        maintenanceLog.setComplaint(saved);
+        maintenanceLog.setWorkType(WorkType.PREVENTIVE);
+        maintenanceLog.setStatus(MaintenanceStatus.PENDING);
+        maintenanceLog.setReportedAt(saved.getReportedAt());
+        maintenanceLogRepository.save(maintenanceLog);
+
         publisher.publishEvent(new NotificationEvent(
-                reported_by,
+                reported_by.getId(),
                 "New Complaint Raised",
                 reported_by.getUsername() +
                         " has raised a complaint on " +
-                        machine.getName()
+                        machine.getName(),
+                NotificationType.BOTH
         ));
 
         listDashboardService.publishListDashboard();

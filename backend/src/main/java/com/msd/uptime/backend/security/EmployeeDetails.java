@@ -21,7 +21,7 @@ public class EmployeeDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(
                 new SimpleGrantedAuthority(
-                        employee.getEmployeeRole().name()
+                        "ROLE_" + employee.getEmployeeRole().name()
                 )
         );
     }

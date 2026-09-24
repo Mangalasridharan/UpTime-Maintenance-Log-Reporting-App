@@ -231,12 +231,22 @@ Open **http://localhost:5173** in your browser!
 
 ### Backend (`backend/.env`)
 
+Switch the database source by setting `DB_PROFILE` to one of `local`, `supabase` or `rds`.
+The corresponding `application-<profile>.properties` file (in `backend/src/main/resources/`)
+holds the provider-specific connection settings.
+
 | Variable | Default Value | Description |
 |---|---|---|
+| `DB_PROFILE` | `local` | Database source: `local`, `supabase`, or `rds` |
 | `PORT` | `8000` | Server listening port |
-| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://localhost:5432/...` | Full JDBC database connection string |
+| `DB_HOST` | `localhost` | Database host (Supabase/RDS endpoint for those profiles) |
+| `DB_PORT` | `5432` | Database port |
+| `DB_NAME` | `Uptime-Maintenance-log-reporting-app` | Database name |
 | `DB_USER` | `postgres` | Database username |
-| `DB_PASSWORD` | `mangal@123` | Database password |
+| `DB_PASSWORD` | `postgres` | Database password (placeholder; use your real credentials) |
+| `SPRING_DATASOURCE_URL` | *(computed by profile)* | Optional full JDBC connection string override |
+| `SPRING_DATASOURCE_USERNAME` | *(from `DB_USER`)* | Optional JDBC username override |
+| `SPRING_DATASOURCE_PASSWORD` | *(from `DB_PASSWORD`)* | Optional JDBC password override |
 | `JWT_SECRET` | `VGhpc0lz...` | Base64-encoded secret key for signing JWTs |
 | `JWT_EXPIRATION` | `1800000` | Token expiration time in milliseconds (30 min) |
 | `ADMIN_EMPLOYEE_NAME` | `mangal` | Default system administrator account |

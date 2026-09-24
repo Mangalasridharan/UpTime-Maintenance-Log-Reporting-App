@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import ThemeToggle from "../component/ThemeToggle";
+import { Loader2 } from "lucide-react";
 import "./auth.css";
 
 function Register() {
@@ -234,22 +235,35 @@ function Register() {
             </div>
           </div>
 
-          <button type="submit" className="btn-submit" disabled={loading}>
-            {loading ? "Provisioning..." : "Register Employee"}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
+          <button
+            type="submit"
+            className={`btn-submit ${loading ? "loading" : ""}`}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="btn-spinner" size={16} />
+                <span>Provisioning...</span>
+              </>
+            ) : (
+              <>
+                <span>Register Employee</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              </>
+            )}
           </button>
         </form>
 

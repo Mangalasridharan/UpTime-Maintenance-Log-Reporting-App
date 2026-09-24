@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import uptimeLogo from "../assets/uptime.png";
 import {
   Cpu,
   Wrench,
@@ -48,11 +49,9 @@ export default function LandingPage() {
       <header className="landing-header">
         <div className="landing-header-inner">
           <Link to="/" className="landing-brand">
-            <div className="brand-icon-box">
-              <Cpu size={22} className="brand-logo-icon" />
-            </div>
+            <img src={uptimeLogo} alt="UpTime Logo" className="landing-brand-logo" />
             <div className="brand-text-group">
-              <span className="brand-name">UPTIME</span>
+              <span className="brand-name">UpTime</span>
               <span className="brand-tag">INDUSTRIAL OS</span>
             </div>
           </Link>
@@ -68,15 +67,12 @@ export default function LandingPage() {
 
           <div className="header-actions">
             <ThemeToggle />
-            <Link to="/demo" className="btn-nav-demo">
+            <Link to="/login" className="btn-nav-demo">
               <Sparkles size={15} />
               <span>Try Demo</span>
             </Link>
-            <Link to="/login" className="btn-nav-ghost">
-              Sign In
-            </Link>
             <Link to="/register" className="btn-nav-primary">
-              Get Started
+              <span>Get Started</span> <ArrowRight size={17} />
             </Link>
           </div>
         </div>
@@ -108,7 +104,7 @@ export default function LandingPage() {
             </p>
 
             <div className="hero-cta-group">
-              <Link to="/demo" className="btn-hero-demo">
+              <Link to="/login" className="btn-hero-demo">
                 <Sparkles size={18} />
                 <span>Try Demo</span>
               </Link>
@@ -116,10 +112,7 @@ export default function LandingPage() {
                 <span>Get Started</span>
                 <ArrowRight size={18} />
               </Link>
-              <Link to="/dashboard" className="btn-hero-secondary">
-                <BarChart3 size={18} />
-                <span>View Dashboard</span>
-              </Link>
+              
             </div>
 
             {/* LIVE TELEMETRY HUD PREVIEW */}
@@ -1275,7 +1268,7 @@ export default function LandingPage() {
                   <span>Start using Uptime</span>
                   <ArrowRight size={18} />
                 </Link>
-                <Link to="/demo" className="btn-cta-demo">
+                <Link to="/login" className="btn-cta-demo">
                   <Sparkles size={18} />
                   <span>Try Demo</span>
                 </Link>
@@ -1297,9 +1290,7 @@ export default function LandingPage() {
           <div className="footer-grid">
             <div className="footer-col brand-col">
               <Link to="/" className="landing-brand">
-                <div className="brand-icon-box">
-                  <Cpu size={20} className="brand-logo-icon" />
-                </div>
+                <img src={uptimeLogo} alt="UpTime Logo" className="landing-brand-logo" style={{ width: '28px', height: '28px' }} />
                 <div className="brand-text-group">
                   <span className="brand-name">UPTIME</span>
                 </div>
@@ -1341,8 +1332,7 @@ export default function LandingPage() {
             <div className="footer-col">
               <h4 className="footer-heading">Demo Sandbox</h4>
               <ul className="footer-links">
-                <li><Link to="/demo">Try Demo Page</Link></li>
-                <li><Link to="/login">Employee Console Login</Link></li>
+                <li><Link to="/login">Try Demo</Link></li>
                 <li><Link to="/register">Register New Account</Link></li>
               </ul>
             </div>

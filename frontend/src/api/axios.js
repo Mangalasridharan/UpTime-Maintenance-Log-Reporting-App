@@ -17,4 +17,16 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+// The backend wraps every response in an ApiResponse envelope:
+//   { success, message, data, timestamp }
+// Unwrap it so the rest of the app keeps reading `response.data`
+// as the actual payload (arrays, objects, etc.).
+api.interceptors.response.use((response) => {
+    const body = response.data;
+    if (body && typeof body === "object" && "success" in body && "data" in body) {
+        response.data = body.data;
+    }
+    return response;
+});
+
 export default api;

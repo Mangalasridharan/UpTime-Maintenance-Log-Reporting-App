@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Users, Search, SlidersHorizontal, UserCheck, Wrench, AlertTriangle, Shield, Award } from "lucide-react";
+import { Users, Search, UserCheck, Wrench, AlertTriangle, Shield, Award } from "lucide-react";
 import api from "../api/axios";
 
 function WorkerDashboard() {
@@ -104,15 +104,12 @@ function WorkerDashboard() {
   return (
     <div className="dashboard-container">
       {/* Dashboard Title Area */}
-      <div className="dashboard-title-area" style={{ marginBottom: "1.5rem" }}>
-        <h1 style={{ margin: "0 0 4px 0", fontSize: "1.5rem" }}>Workforce Registry</h1>
-        <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-          Monitor active technician assignments, specializations, and real-time availability.
-        </p>
+      <div className="dashboard-title-area" style={{ marginBottom: "0.75rem" }}>
+        <h1 style={{ margin: 0, fontSize: "1.5rem" }}>Worker Dashboard</h1>
       </div>
 
       {/* Workforce Statistics Grid */}
-      <div className="stats-grid" style={{ marginBottom: "2rem" }}>
+      <div className="stats-grid" style={{ marginBottom: "1rem" }}>
         <div className="stat-card stat-total">
           <div className="stat-card-icon">
             <Users size={16} />
@@ -154,49 +151,51 @@ function WorkerDashboard() {
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="filter-bar">
-        <div className="filter-search-container">
-          <Search size={16} className="search-icon-inside" />
-          <input
-            type="text"
-            className="filter-search-input"
-            placeholder="Search technicians, spec, dept..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      {/* Unified Search and Filters Controls */}
+      <div className="dashboard-controls">
+        <div className="dashboard-search-row">
+          <div className="filter-search-container">
+            <Search size={16} className="search-icon-inside" />
+            <input
+              type="text"
+              className="filter-search-input"
+              placeholder="Search technicians, spec, dept..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <SlidersHorizontal size={14} style={{ color: "var(--text-secondary)" }} />
-          
-          {/* Availability Status Filter */}
-          <select
-            name="status"
-            className="filter-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            title="Filter by Availability"
-          >
-            <option value="ALL">All States</option>
-            <option value="AVAILABLE">Available</option>
-            <option value="BUSY">Busy</option>
-          </select>
+        <div className="dashboard-filters-row">
+          <div className="dashboard-filters-group">
+            {/* Availability Status Filter */}
+            <select
+              name="status"
+              className="filter-select"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              title="Filter by Availability"
+            >
+              <option value="ALL">All States</option>
+              <option value="AVAILABLE">Available</option>
+              <option value="BUSY">Busy</option>
+            </select>
 
-          {/* Role Filter */}
-          <select
-            name="role"
-            className="filter-select"
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            title="Filter by Role"
-          >
-            <option value="ALL">All Roles</option>
-            <option value="SHIFT_WORKER">Shift Workers</option>
-            <option value="GENERAL_WORKER">General Workers</option>
-            <option value="HOD">HODs</option>
-            <option value="HEAD">Heads</option>
-          </select>
+            {/* Role Filter */}
+            <select
+              name="role"
+              className="filter-select"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              title="Filter by Role"
+            >
+              <option value="ALL">All Roles</option>
+              <option value="SHIFT_WORKER">Shift Workers</option>
+              <option value="GENERAL_WORKER">General Workers</option>
+              <option value="HOD">HODs</option>
+              <option value="HEAD">Heads</option>
+            </select>
+          </div>
         </div>
       </div>
 

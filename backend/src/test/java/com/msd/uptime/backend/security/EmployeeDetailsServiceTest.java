@@ -37,7 +37,7 @@ class EmployeeDetailsServiceTest {
         assertThat(details.getPassword()).isEqualTo(employee.getPassword());
         assertThat(details.getAuthorities())
                 .extracting("authority")
-                .containsExactly("GENERAL_WORKER");
+                .containsExactly("ROLE_GENERAL_WORKER");
     }
 
     @Test

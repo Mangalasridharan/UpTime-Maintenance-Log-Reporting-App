@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -63,7 +65,7 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests(requests -> requests.requestMatchers("/", "/health", "/uptime/api/v1/home/**", "/ws/**", "/uptime/api/v1/employee/auth/**").permitAll()
+                .authorizeHttpRequests(requests -> requests.requestMatchers("/", "/health", "/uploads/**", "/uptime/api/v1/home/**", "/ws/**", "/uptime/api/v1/notifications/stream/**", "/uptime/api/v1/employee/auth/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(display -> display.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())

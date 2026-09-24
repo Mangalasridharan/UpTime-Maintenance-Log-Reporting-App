@@ -1,7 +1,6 @@
 package com.msd.uptime.backend.models;
 
 import jakarta.persistence.*;
-import com.msd.uptime.backend.models.MachineStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,4 +28,8 @@ public class Machine {
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "operator_id")
+    private Employee operator;
 }
